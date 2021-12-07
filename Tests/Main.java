@@ -6,9 +6,9 @@ class Main extends Program {
     void algorithm() {
 
         do {
+            int initialTemps = (int) (getTime() / 1000);
             int choix = choisir();
 
-            int initialTemps = (int) (getTime() / 1000);
             int ecartTemps = (int) ((getTime()/1000)-initialTemps);
             println("Temps d'interaction de " + ecartTemps + " secondes");
             for (int i=0; i< length(capital_per_second); i++){
@@ -18,37 +18,34 @@ class Main extends Program {
         } while(capital>0);
     }
 
-    boolean estNombre(String action) {
-        boolean estValide = true;
-        if (length(action) == 0) {
-            estValide = false;
-        }
-        int idx = 0;
-        while (estValide && idx < length(action)) {
-            if (chartAt(action, idx) < '0' || charAt(action, idx) > '9') {
-                estValide = false;
-            }
-            idx++;
-        }
+    // boolean estNombre(String action) {
+    //     boolean estValide = true;
+    //     if (length(action) == 0) {
+    //         estValide = false;
+    //     }
+    //     int idx = 0;
+    //     while (estValide && idx < length(action)) {
+    //         if (chartAt(action, idx) < '0' || charAt(action, idx) > '9') {
+    //             estValide = false;
+    //         }
+    //         idx++;
+    //     }
 
-        return estValide;
-    }
+    //     return estValide;
+    // }
 
     int choisir() {
         boolean estValide = false;
-        String choix;
+        int choix;
         do {
             println("1: Récupérer l'argent");
             println("2: Améliorer la production");
             println("3: Construire");
 
-            choix = readString();
-            if (estNombre(choix)) {
-                // Valide
-            } else {
-                println("Entrée invalide. Veuillez réessayer.");
-            }
+            choix = readInt();
+            estValide = true;
         } while (!estValide);
+        return choix;
     }
     
 }
