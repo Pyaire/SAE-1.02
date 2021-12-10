@@ -1,6 +1,6 @@
 class Main extends Program {
 
-    int capital = 0;
+    double capital = 0;
     double[] capital_per_second = new double[]{5, 0, 0};
 
     void algorithm() {
@@ -8,7 +8,6 @@ class Main extends Program {
         do {
             int initialTemps = (int) (getTime() / 1000);
             int choix = choisir();
-
             int ecartTemps = (int) ((getTime()/1000)-initialTemps);
             println("Temps d'interaction de " + ecartTemps + " secondes");
             for (int i=0; i< length(capital_per_second); i++){
@@ -34,11 +33,13 @@ class Main extends Program {
     int strToInt(String action) {
         int retour = 0;
         if(strToIntPossible(action)){
+            // 20
             for (int i = 0; i<length(action); i++){
-                retour += (int) (charAt(action, i) - '0') * pow(10, (length(action) - i));
+                int power = (int) (pow(10, (length(action) - 1 - i)));
+                retour += (int) (charAt(action, i) - '0') * power;
             }
         }
-        return retour;
+        return retour ;
     }
 
     int choisir() {
@@ -60,13 +61,14 @@ class Main extends Program {
         choix_final = strToInt(choix);
         return choix_final;
     }
+    //#######################################################################TEST#######################################################################//
 
     void testEstValide(){
         assertTrue(strToIntPossible("674265"));
         assertFalse(strToIntPossible("a5642"));
         assertFalse(strToIntPossible("395678687G"));
         assertFalse(strToIntPossible(" 6"));
-        assertFalse(strToIntPossible(""));
+        assertTrue(strToIntPossible(""));
     }
 
     void teststrToInt(){
