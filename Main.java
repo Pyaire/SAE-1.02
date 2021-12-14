@@ -3,10 +3,10 @@ class Main extends Program {
     // /!\ à faire : tout mettre dans un csv paramètres /!\
 
         double capital = 25;
-        double prixMagasin = 1;
-        Magasin[] magasins = new Magasin[3];
-        int nbMagasins = 0;
-        int maxMagasins = 2;
+        double prixJouet = 1;
+        int nbJouets = 0;
+        int maxJouets = 2;
+        Jouet[] jouets = new Jouet[maxJouets];
         final String DEVISE = "euros";
 
         String nomPatron;
@@ -24,20 +24,20 @@ class Main extends Program {
             int ecartTemps = (int) ((getTime()/1000)-initialTemps);
             tpsImpots += ecartTemps;
             if (tpsImpots >= ecartImpot){
-                capital = (capital - (capital*0.3));
-                println("Vous avez payé " + (capital*0.3) + " " + DEVISE + " d'impôts !");
+                capital = (capital - (totalParSeconde()*0.3));
+                println("Vous avez payé " + (totalParSeconde()*0.3) + " " + DEVISE + " d'impôts !");
                 delay(2500);
                 tpsImpots = 0;
             }
             if (choix == 2) {
-                achatMagasin();       // Achat de magasin
+                achatJouet(); // Achat de nouveau jouet
             } else if (choix == 3) {
                 // Amélioration
                 menuAmelioration();
             } else {
                 // Récupérer l'argent
-                for (int i=0; i<nbMagasins; i++){
-                    capital += (magasins[i].revenu * ecartTemps);
+                for (int i=0; i<nbJouets; i++){
+                    capital += (jouets[i].revenu * ecartTemps);
                 }
             }
         } while(capital>0);
@@ -77,7 +77,7 @@ class Main extends Program {
             println("Votre captial est de " + capital + " " + DEVISE);
             println("Vous produisez " + totalParSeconde() + " " + DEVISE + " par seconde.");
             println("1: Récupérer l'argent");
-            println("2: Acheter un nouveau magasin");
+            println("2: Acheter un nouveau jouet");
             println("3: Améliorer la production");
             println("4: Construire");
 
@@ -91,44 +91,44 @@ class Main extends Program {
         return choix_final;
     }
 
-    Magasin nouveauMagasin(String nom) {
-        Magasin nouveau = new Magasin();
+    Jouet nouveauJouet(String nom) {
+        Jouet nouveau = new Jouet();
         nouveau.nom = nom;
         nouveau.revenu = 5;
         nouveau.prixAmelioration = 50;
-        nbMagasins++;
+        nbJouets++;
         return nouveau;
     }
 
     void menuAmelioration() {
-        println("Quel magasin souhaitez vous améliorer ?");
-        for (int i_magasin=0; i_magasin<nbMagasins; i_magasin++) {
-            println((i_magasin+1) + " : " + magasins[i_magasin].nom);
+        println("Quel jouet souhaitez vous améliorer ?");
+        for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
+            println((i_jouet+1) + " : " + jouets[i_jouet].nom);
         }
         delay(2000);
     }
 
     double totalParSeconde() {
         double total = 0;
-        for (int i_magasin=0; i_magasin<nbMagasins; i_magasin++) {
-            total += magasins[i_magasin].revenu;
+        for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
+            total += jouets[i_jouet].revenu;
         }
         return total;
     }
 
-    void achatMagasin() {
-        println("Voulez vous acheter un nouveau magasin pour " + prixMagasin + " " + DEVISE + " ?");
+    void achatJouet() {
+        println("Voulez vous acheter un nouveau jouet pour " + prixJouet + " " + DEVISE + " ?");
         print("Oui / Non : ");
         String reponse = toLowerCase(readString());
         println(reponse);
         if (equals(reponse, "oui")) {
-            if (nbMagasins < maxMagasins) {
-                println("Bravo ! Vous venez d'acheter un nouveau magasin ! Comment voulez vous l'appeller ?");
-                Magasin nouveau = nouveauMagasin(readString());
-                magasins[(nbMagasins-1)] = nouveau;
-                println("Tout est bon, votre magasin produira " + magasins[(nbMagasins-1)].revenu + " " + DEVISE + " par seconde !");
+            if (nbJouets < maxJouets) {
+                println("Bravo ! Vous venez d'acheter un nouveau jouet ! Comment voulez vous l'appeller ?");
+                Jouet nouveau = nouveauJouet(readString());
+                jouets[(nbJouets-1)] = nouveau;
+                println("Tout est bon, votre jouet produira " + jouets[(nbJouets-1)].revenu + " " + DEVISE + " par seconde !");
             } else {
-                println("Mince ! Vous avez acheté tous les magasins possibles !");
+                println("Mince ! Vous avez acheté tous les jouets possibles !");
             }
             delay(2000);
         }
