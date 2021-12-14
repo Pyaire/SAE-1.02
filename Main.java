@@ -1,30 +1,41 @@
 class Main extends Program {
 
-    double capital = 25;
-    double prixMagasin = 1;
-    Magasin[] magasins = new Magasin[3];
-    int nbMagasins = 0;
-    int maxMagasins = 1;
-    final String DEVISE = "euros";
+    // /!\ à faire : tout mettre dans un csv paramètres /!\
 
-    String nomPatron;
+        double capital = 25;
+        double prixMagasin = 1;
+        Magasin[] magasins = new Magasin[3];
+        int nbMagasins = 0;
+        int maxMagasins = 2;
+        final String DEVISE = "euros";
+
+        String nomPatron;
+        int tpsImpots = 0;
+        int ecartImpot = 20;  // en seconde
+        double taxes = 0;
+
+    // -----
 
     void algorithm() {
-        //introduction();
+        introduction();
         do {
             int initialTemps = (int) (getTime() / 1000);
             int choix = choisir();
+            int ecartTemps = (int) ((getTime()/1000)-initialTemps);
+            tpsImpots += ecartTemps;
+            if (tpsImpots >= ecartImpot){
+                capital = (capital - (capital*0.3));
+                println("Vous avez payé " + (capital*0.3) + " " + DEVISE + " d'impôts !");
+                delay(2500);
+                tpsImpots = 0;
+            }
             if (choix == 2) {
-                // Achat de magasin
-                achatMagasin();
+                achatMagasin();       // Achat de magasin
             } else if (choix == 3) {
                 // Amélioration
                 menuAmelioration();
-            } else if (choix == 4) {
-
             } else {
                 // Récupérer l'argent
-                int ecartTemps = (int) ((getTime()/1000)-initialTemps);
                 for (int i=0; i<nbMagasins; i++){
                     capital += (magasins[i].revenu * ecartTemps);
                 }
@@ -48,7 +59,6 @@ class Main extends Program {
     int strToInt(String action) {
         int retour = 0;
         if(strToIntPossible(action)){
-            // 20
             for (int i = 0; i<length(action); i++){
                 int power = (int) (pow(10, (length(action) - 1 - i)));
                 retour += (int) (charAt(action, i) - '0') * power;
@@ -63,7 +73,9 @@ class Main extends Program {
         int choix_final;
         do {
             clearScreen();
+            cursor(1, 1);
             println("Votre captial est de " + capital + " " + DEVISE);
+            println("Vous produisez " + totalParSeconde() + " " + DEVISE + " par seconde.");
             println("1: Récupérer l'argent");
             println("2: Acheter un nouveau magasin");
             println("3: Améliorer la production");
@@ -90,6 +102,18 @@ class Main extends Program {
 
     void menuAmelioration() {
         println("Quel magasin souhaitez vous améliorer ?");
+        for (int i_magasin=0; i_magasin<nbMagasins; i_magasin++) {
+            println((i_magasin+1) + " : " + magasins[i_magasin].nom);
+        }
+        delay(2000);
+    }
+
+    double totalParSeconde() {
+        double total = 0;
+        for (int i_magasin=0; i_magasin<nbMagasins; i_magasin++) {
+            total += magasins[i_magasin].revenu;
+        }
+        return total;
     }
 
     void achatMagasin() {
@@ -112,6 +136,7 @@ class Main extends Program {
 
     void introduction() {
         clearScreen();
+        cursor(1, 1);
         int delay = 1500;
         String nomEmploye = "Pyaire";
         println(nomEmploye + " : Bonjour ! Bienvenue dans votre usine patron !");
