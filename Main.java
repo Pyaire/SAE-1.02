@@ -3,7 +3,7 @@ class Main extends Program {
     // /!\ à faire : tout mettre dans un csv paramètres /!\
 
         double capital = 25;
-        double prixJouet = 1;
+        double prixJouet = 25;
         int nbJouets = 0;
         int maxJouets = 2;
         Jouet[] jouets = new Jouet[maxJouets];
@@ -11,7 +11,8 @@ class Main extends Program {
 
         String nomPatron;
         int tpsImpots = 0;
-        int ecartImpot = 20;  // en seconde
+        int ECART_IMPOTS = 20;  // en seconde
+        double TAUX_IMPOTS = 1000000;
         double taxes = 0;
 
     // -----
@@ -23,9 +24,9 @@ class Main extends Program {
             int choix = choisir();
             int ecartTemps = (int) ((getTime()/1000)-initialTemps);
             tpsImpots += ecartTemps;
-            if (tpsImpots >= ecartImpot){
-                capital = (capital - (totalParSeconde()*0.3));
-                println("Vous avez payé " + (totalParSeconde()*0.3) + " " + DEVISE + " d'impôts !");
+            if (tpsImpots >= ECART_IMPOTS){
+                capital = (capital - (totalParSeconde()*TAUX_IMPOTS));
+                println("Vous avez payé " + (totalParSeconde()*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
                 delay(2500);
                 tpsImpots = 0;
             }
@@ -41,6 +42,7 @@ class Main extends Program {
                 }
             }
         } while(capital>0);
+        println("Vous avez perdu !");
     }
 
     boolean strToIntPossible(String action){
@@ -72,8 +74,7 @@ class Main extends Program {
         String choix;
         int choix_final;
         do {
-            clearScreen();
-            cursor(1, 1);
+            clearConsole();
             println("Votre captial est de " + capital + " " + DEVISE);
             println("Vous produisez " + totalParSeconde() + " " + DEVISE + " par seconde.");
             println("1: Récupérer l'argent");
@@ -94,7 +95,7 @@ class Main extends Program {
     Jouet nouveauJouet(String nom) {
         Jouet nouveau = new Jouet();
         nouveau.nom = nom;
-        nouveau.revenu = 5;
+        nouveau.revenu = 1;
         nouveau.prixAmelioration = 50;
         nbJouets++;
         return nouveau;
@@ -127,6 +128,7 @@ class Main extends Program {
                 Jouet nouveau = nouveauJouet(readString());
                 jouets[(nbJouets-1)] = nouveau;
                 println("Tout est bon, votre jouet produira " + jouets[(nbJouets-1)].revenu + " " + DEVISE + " par seconde !");
+                capital -= prixJouet;
             } else {
                 println("Mince ! Vous avez acheté tous les jouets possibles !");
             }
@@ -135,11 +137,10 @@ class Main extends Program {
     }
 
     void introduction() {
-        clearScreen();
-        cursor(1, 1);
+        clearConsole();
         int delay = 1500;
         String nomEmploye = "Pyaire";
-        println(nomEmploye + " : Bonjour ! Bienvenue dans votre usine patron !");
+        println(nomEmploye + " : Bonjour ! Bienvenue dans votre magasin patron !");
         delay(delay);
         println(nomEmploye + " : Tiens, on dirait qu'il n'y a pas beaucoup d'argent dans votre porte feuilles...");
         delay(delay);
@@ -149,6 +150,43 @@ class Main extends Program {
         nomPatron = readString();
         println(nomEmploye + " : Très bien " + nomPatron + ", on y va !");
         delay(delay);
+        println(nomEmploye + " : Voulez-vous que je vous explique votre mission (Oui / Non) ?");
+        String answer = readString();
+        if (equals(toLowerCase(answer), "oui")) {
+            regles(delay);
+        }
+        clearConsole();
+    }
+
+    void regles(int delay) {
+        delay *= 2;
+        clearConsole();
+        println("Voici votre mission :");
+        println("-------------------------");
+        delay(delay);
+        println("Vous venez d'arriver dans votre magasin.");
+        delay(delay);
+        println("Votre but : gagner de l'argent le plus efficacement possible");
+        delay(delay);
+        println("Attention tout de même à bien gérer vos finances,");
+        delay(delay);
+        println("toutes les " + ECART_IMPOTS + " secondes, vous devrez payer " + (TAUX_IMPOTS*100) + "% de votre production par seconde !");
+        delay(delay);
+        println("Si vous tombez en dessous des 0 euros de capital, c'est perdu !");
+        delay(delay);
+        println("Vous pourrez acheter un nouveau produit qui vous rapportera de l'argent par seconde,");
+        delay(delay);
+        println("vous pouvez aussi en améliorer un pour qu'il vous rapporte plus !");
+        delay(delay);
+        println();
+        println("Bonne chance à vous patron !");
+        println("-------------------------");
+        delay(delay*2);
+    }
+
+    void clearConsole() {
+        clearScreen();
+        cursor(1, 1);
     }
 
     //##################################################################     TESTS     #######################################################################//
