@@ -2,7 +2,7 @@ class Main extends Program {
 
     // /!\ à faire : tout mettre dans un csv paramètres /!\
 
-        double capital = 25;
+        double capital = 50;
         double prixJouet = 25;
         int nbJouets = 0;
         int maxJouets = 2;
@@ -12,7 +12,7 @@ class Main extends Program {
         String nomPatron;
         int tpsImpots = 0;
         int ECART_IMPOTS = 20;  // en seconde
-        double TAUX_IMPOTS = 1000000;
+        double TAUX_IMPOTS = 0.3;
         double taxes = 0;
 
     // -----
@@ -27,8 +27,8 @@ class Main extends Program {
             if (tpsImpots >= ECART_IMPOTS){
                 capital = (capital - (totalParSeconde()*TAUX_IMPOTS));
                 println("Vous avez payé " + (totalParSeconde()*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
-                delay(2500);
                 tpsImpots = 0;
+                delay(4000);
             }
             if (choix == 2) {
                 achatJouet(); // Achat de nouveau jouet
@@ -41,7 +41,7 @@ class Main extends Program {
                     capital += (jouets[i].revenu * ecartTemps);
                 }
             }
-        } while(capital>0);
+        } while(capital>=0);
         println("Vous avez perdu !");
     }
 
@@ -75,12 +75,15 @@ class Main extends Program {
         int choix_final;
         do {
             clearConsole();
-            println("Votre captial est de " + capital + " " + DEVISE);
-            println("Vous produisez " + totalParSeconde() + " " + DEVISE + " par seconde.");
-            println("1: Récupérer l'argent");
-            println("2: Acheter un nouveau jouet");
-            println("3: Améliorer la production");
-            println("4: Construire");
+            informations();
+
+            println("==================================================        Choix       ==================================================");
+            println("                    1                             Récupérer l'argent");
+            println("                    2                             Acheter un nouveau jouet");
+            println("                    3                             Améliorer la production");
+            println("                    4                             Construire");
+            println("========================================================================================================================");
+            println();
 
             choix = readString(5000);
             estValide = strToIntPossible(choix);
@@ -90,6 +93,16 @@ class Main extends Program {
         } while (!estValide);
         choix_final = strToInt(choix);
         return choix_final;
+    }
+
+    void informations() {
+        // Afficher les informations sur l'usine
+        println("==================================================    Informations    ==================================================");
+        println("                    Argent Total                      " + capital  + " " + DEVISE);
+        println("                    Production par seconde            " + totalParSeconde() + " " + DEVISE);
+        println("                    Prévision Impôts                  " + totalParSeconde() * TAUX_IMPOTS + " " + DEVISE + " (Dans " + (ECART_IMPOTS - tpsImpots) + " secondes)");
+        println("========================================================================================================================");
+        println();
     }
 
     Jouet nouveauJouet(String nom) {
@@ -132,7 +145,7 @@ class Main extends Program {
             } else {
                 println("Mince ! Vous avez acheté tous les jouets possibles !");
             }
-            delay(2000);
+            delay(4000);
         }
     }
 
