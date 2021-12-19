@@ -35,6 +35,9 @@ class Main extends Program {
             } else if (choix == 3) {
                 // Amélioration
                 menuAmelioration();
+            } else if (choix == 4) {
+                println("Cette fonctionnalité n'est pas encore disponible...");
+                delay(2500);
             } else {
                 // Récupérer l'argent
                 for (int i=0; i<nbJouets; i++){
