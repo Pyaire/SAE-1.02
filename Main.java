@@ -42,7 +42,8 @@ class Main extends Program {
                 }
             }
         } while(capital>=0);
-        println("Vous avez perdu !");
+        println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
+        println("Pensez à mieux gérer vos finances !");
     }
 
     boolean strToIntPossible(String action){
@@ -117,7 +118,33 @@ class Main extends Program {
     void menuAmelioration() {
         println("Quel jouet souhaitez vous améliorer ?");
         for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
-            println((i_jouet+1) + " : " + jouets[i_jouet].nom);
+            println((i_jouet+1) + " : " + jouets[i_jouet].nom + " (" + jouets[i_jouet].prixAmelioration + " " + DEVISE + ")");
+        }
+        int toUpgrade = 0;
+        do {
+            print("Jouet à améliorer : ");
+            String toUpgradeToy = readString();
+            if (!strToIntPossible(toUpgradeToy)) {
+                println("Il semblerait que vous n'ayez pas entré un nombre");
+            } else {
+                int toUpgradeTemp = strToInt(toUpgradeToy);
+                if (toUpgradeTemp > 0 && toUpgradeTemp <= nbJouets) {
+                    toUpgrade = toUpgradeTemp;
+                } else {
+                    println("Le jouet n'a pas été trouvé !");
+                }
+            }
+        } while (toUpgrade == 0);
+        println("Êtes vous sûr de vouloir améliorer votre production de " + jouets[(toUpgrade-1)].nom + " pour un total de " + jouets[(toUpgrade-1)].prixAmelioration + " " + DEVISE + " ?");
+        String confirm = readString();
+        if (equals("oui", toLowerCase(confirm))) {
+            // Confirmation
+            jouets[(toUpgrade-1)].revenu *= 3;
+            println("Bravo ! Votre jouet a été amélioré ! Il vous rapporte désormais " + jouets[(toUpgrade-1)].revenu + " " + DEVISE + " par seconde !");
+            capital -= jouets[(toUpgrade-1)].prixAmelioration;
+            delay(2000);
+        } else {
+            println("Dommage !");
         }
         delay(2000);
     }
