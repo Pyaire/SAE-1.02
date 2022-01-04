@@ -3,7 +3,7 @@ class Main extends Program {
         final int MAXJOUETS = 3;
         final String DEVISE = "euros";
         final int ECART_IMPOTS = 20;  // en seconde
-        final double TAUX_IMPOTS = 0.3;
+        final double TAUX_IMPOTS = 5; // Part de revenue par seconde
         final double TAUX_REVENU = 0.05;
         final double TAUX_AMELIORATION = 1.5;
         final int MULT_NOUVEAU_ACHAT = 100;
@@ -22,6 +22,7 @@ class Main extends Program {
     void algorithm() {
         introduction();
         do {
+            capital = round(capital);
             int initialTemps = (int) (getTime() / 1000);
             int choix = choisir();
             if (choix == 2) {
