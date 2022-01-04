@@ -1,12 +1,12 @@
 class Main extends Program {
 
-        final int MAXJOUETS = 2;
+        final int MAXJOUETS = 3;
         final String DEVISE = "euros";
         final int ECART_IMPOTS = 20;  // en seconde
         final double TAUX_IMPOTS = 0.3;
         final double TAUX_REVENU = 0.1;
         final double TAUX_AMELIORATION = 1.5;
-        final int MULT_AMELIORATION = 100;
+        final int MULT_NOUVEAU_ACHAT = 100;
         final double BASE_PRIX_ACHAT = 50;
 
     // /!\ à faire : tout mettre dans un csv paramètres /!\
@@ -38,13 +38,13 @@ class Main extends Program {
                 // Amélioration
                 menuAmelioration();
             } else if (choix == 4) {
+                infos_jouets();
+            } else if (choix == 5) {
                 println("Cette fonctionnalité n'est pas encore disponible...");
                 delay(2500);
             } else {
                 // Récupérer l'argent
-                for (int i=0; i<nbJouets; i++){
-                    capital += (jouets[i].revenu * ecartTemps);
-                }
+                capital += totalParSeconde() * ecartTemps;
             }
         } while(capital>=0);
         println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
@@ -63,7 +63,10 @@ class Main extends Program {
             println("                    1                             Récupérer l'argent");
             println("                    2                             Acheter un nouveau jouet");
             println("                    3                             Améliorer la production");
-            println("                    4                             Construire");
+            println("                    4                             Informations sur les jouets");
+            if (nbJouets == MAXJOUETS) {
+                println("                    5                          ===   Terminer le jeu  ===                                               ");
+            }
             println("========================================================================================================================");
             println();
 
@@ -87,34 +90,85 @@ class Main extends Program {
         println();
     }
 
-    Jouet nouveauJouet(String nom) {
+    Jouet nouveauJouet(String nom, double prixAchat) {
         Jouet nouveau = new Jouet();
         nouveau.nom = nom;
-        nouveau.revenu = 1;
-        nouveau.prixAmelioration = 50;
+        nouveau.prixAchat = prixAchat;
+        nouveau.niveau = 1;
         nbJouets++;
         return nouveau;
     }
 
     void achatJouet() {
-        double prixJouet;
-        if (nbJouets == 0) {
-            prixJouet = BASE_PRIX_ACHAT;
+        if (nbJouets < MAXJOUETS) {
+            double prixJouet;
+            if (nbJouets == 0) {
+                prixJouet = BASE_PRIX_ACHAT;
+            } else {
+                prixJouet = jouets[(nbJouets-1)].prixAchat * MULT_NOUVEAU_ACHAT;
+            }
+            println("==================================================   Achat de Jouet   ==================================================");
+            println("                    Prix du jouet                    " + prixJouet  + " " + DEVISE);
+            println("                                              Confirmer l'achat ? (Oui / Non) ");
+            print("Confirmation : ");
+            String answer = readString();
+            println("========================================================================================================================");
+            if (equals("oui", toLowerCase(answer))) {
+                // Confirmé
+                if (capital >= prixJouet) {
+                    print("Nom du jouet (ex: Ours en peluche) : ");
+                    String nomJouet = readString();
+                    jouets[nbJouets] = nouveauJouet(nomJouet, prixJouet);
+                    capital -= prixJouet;
+                    println("Bravo ! Vous venez d'acheter un nouveau jouet !");
+                } else {
+                    println("Vous ne pouvez pas vous le permettre... Revenez plus tard !");
+                }
+            } else {
+                // Abandonné
+                println("Tant pis ! Revenez vite !");
+            }
         } else {
-            prixJouet = jouets[(nbJouets-1)].prixAchat * MULT_AMELIORATION;
+            println("Vous ne pouvez pas acheter plus de jouets, mais vous pouvez terminer le jeu !");
         }
-        println("==================================================   Achat de Jouet   ==================================================");
-        println("                    Prix du jouet                    " + prixJouet  + " " + DEVISE);
-        println("                                              Confirmer l'achat ? (Oui / Non) ");
+        delay(2500);
+    }
+
+    void menuAmelioration() {
+        // Lister les jouets
+        int choix = -1;
+        for (int iJouet=0; iJouet<nbJouets; iJouet++) {
+            double prixAmelio = (jouets[iJouet].prixAchat * pow(TAUX_AMELIORATION, (jouets[iJouet].niveau-1)));
+            println((iJouet+1) + " : " + jouets[iJouet].nom + " - Niveau " + jouets[iJouet].niveau + " (" + prixAmelio + " " + DEVISE + ")");
+        }
+        do {
+            print("Jouet à améliorer : ");
+            String reponse = readString();
+            if (strToIntPossible(reponse)) {
+                int reponse_int = strToInt(reponse);
+                if (reponse_int > 0 && reponse_int <= nbJouets) {
+                    choix = reponse_int;
+                } else {
+                    println("Le choix n'est pas dans la liste !");
+                }
+            } else {
+                println("Vous devez entrer un nombre !");
+            }
+        } while (choix == -1);
+        choix--; // Le convertir pour un array
+        double prixAmelioration = (jouets[choix].prixAchat * pow(TAUX_AMELIORATION, (jouets[choix].niveau))); // Pas -1 au niveau car on cherche le prochain prix
+        println("==============================================   Amélioration de Jouet   ===============================================");
+        println("                    Prix de l'amélioration       " + prixAmelioration  + " " + DEVISE);
+        println("                                         Confirmer l'amélioration ? (Oui / Non) ");
         print("Confirmation : ");
         String answer = readString();
         println("========================================================================================================================");
         if (equals("oui", toLowerCase(answer))) {
             // Confirmé
-            if (capital >= prixJouet) {
-                print("Nom du jouet (ex: Ours en peluche) : ");
-                jouets[nbJouets] = nouveauJouet(readString());
-                println("Bravo ! Vous venez d'acheter un nouveau jouet !");
+            if (capital >= prixAmelioration) {
+                jouets[choix].niveau++;
+                capital -= prixAmelioration;
+                println("Bravo ! Vous venez d'améliorer un jouet !");
             } else {
                 println("Vous ne pouvez pas vous le permettre... Revenez plus tard !");
             }
@@ -125,66 +179,8 @@ class Main extends Program {
         delay(2500);
     }
 
-    // void achatJouet() {
-    //     println("Voulez vous acheter un nouveau jouet pour " + PRIXJOUET + " " + DEVISE + " ?");
-    //     print("Oui / Non : ");
-    //     String reponse = toLowerCase(readString());
-    //     println(reponse);
-    //     if (equals(reponse, "oui")) {
-    //         if (nbJouets < MAXJOUETS) {
-    //             if (capital >= prixJouet) {
-    //                 println("Bravo ! Vous venez d'acheter un nouveau jouet ! Comment voulez vous l'appeller ?");
-    //                 Jouet nouveau = nouveauJouet(readString());
-    //                 jouets[(nbJouets-1)] = nouveau;
-    //                 println("Tout est bon, votre jouet produira " + jouets[(nbJouets-1)].revenu + " " + DEVISE + " par seconde !");
-    //                 capital -= prixJouet;
-    //                 prixJouet = prixJouet + 10*prixJouet;
-    //             } else {
-    //                 println("Vous ne pouvez malheureusement pas vous permettre cet achat !");
-    //             }
-    //         } else {
-    //             println("Mince ! Vous avez acheté tous les jouets possibles !");
-    //         }
-    //         delay(4000);
-    //     }
-    // }
-
-    // void menuAmelioration() {
-    //     println("Quel jouet souhaitez vous améliorer ?");
-    //     for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
-    //         println((i_jouet+1) + " : " + jouets[i_jouet].nom + " (" + jouets[i_jouet].prixAmelioration + " " + DEVISE + ")");
-    //     }
-    //     int toUpgrade = 0;
-    //     do {
-    //         print("Jouet à améliorer : ");
-    //         String toUpgradeToy = readString();
-    //         if (!strToIntPossible(toUpgradeToy)) {
-    //             println("Il semblerait que vous n'ayez pas entré un nombre");
-    //         } else {
-    //             int toUpgradeTemp = strToInt(toUpgradeToy);
-    //             if (toUpgradeTemp > 0 && toUpgradeTemp <= nbJouets) {
-    //                 toUpgrade = toUpgradeTemp;
-    //             } else {
-    //                 println("Le jouet n'a pas été trouvé !");
-    //             }
-    //         }
-    //     } while (toUpgrade == 0);
-    //     println("Êtes vous sûr de vouloir améliorer votre production de " + jouets[(toUpgrade-1)].nom + " pour un total de " + jouets[(toUpgrade-1)].prixAmelioration + " " + DEVISE + " ?");
-    //     String confirm = readString();
-    //     if (equals("oui", toLowerCase(confirm))) {
-    //         // Confirmation
-    //         jouets[(toUpgrade-1)].revenu *= 3;
-    //         println("Bravo ! Votre jouet a été amélioré ! Il vous rapporte désormais " + jouets[(toUpgrade-1)].revenu + " " + DEVISE + " par seconde !");
-    //         capital -= jouets[(toUpgrade-1)].prixAmelioration;
-    //         delay(2000);
-    //     } else {
-    //         println("Dommage !");
-    //     }
-    //     delay(2000);
-    // }
-
-    void menuAmelioration() {
-
+    void infos_jouets() {
+        
     }
 
     void introduction() {
@@ -210,7 +206,7 @@ class Main extends Program {
     }
 
     void regles(int delay) {
-        delay *= 2;
+        delay *= 2; // Phrases longues
         clearConsole();
         println("Voici votre mission :");
         println("-------------------------");
@@ -268,7 +264,8 @@ class Main extends Program {
     double totalParSeconde() {
         double total = 0;
         for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
-            total += jouets[i_jouet].revenu;
+            double dernierPrix = (jouets[i_jouet].prixAchat * pow(TAUX_AMELIORATION, (jouets[i_jouet].niveau-1))); // niveau-1 car dès qu'on l'achète, le jouet est niveau 1
+            total += dernierPrix * TAUX_REVENU;
         }
         return total;
     }
