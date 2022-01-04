@@ -4,7 +4,7 @@ class Main extends Program {
         final String DEVISE = "euros";
         final int ECART_IMPOTS = 20;  // en seconde
         final double TAUX_IMPOTS = 0.3;
-        final double TAUX_REVENU = 0.1;
+        final double TAUX_REVENU = 0.05;
         final double TAUX_AMELIORATION = 1.5;
         final int MULT_NOUVEAU_ACHAT = 100;
         final double BASE_PRIX_ACHAT = 50;
@@ -24,14 +24,6 @@ class Main extends Program {
         do {
             int initialTemps = (int) (getTime() / 1000);
             int choix = choisir();
-            int ecartTemps = (int) ((getTime()/1000)-initialTemps);
-            tpsImpots += ecartTemps;
-            if (tpsImpots >= ECART_IMPOTS){
-                capital = (capital - (totalParSeconde()*TAUX_IMPOTS));
-                println("Vous avez payé " + (totalParSeconde()*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
-                tpsImpots = 0;
-                delay(4000);
-            }
             if (choix == 2) {
                 achatJouet(); // Achat de nouveau jouet
             } else if (choix == 3) {
@@ -44,7 +36,15 @@ class Main extends Program {
                 delay(2500);
             } else {
                 // Récupérer l'argent
+                int ecartTemps = (int) ((getTime()/1000)-initialTemps);
                 capital += totalParSeconde() * ecartTemps;
+                tpsImpots += ecartTemps;
+                if (tpsImpots >= ECART_IMPOTS){
+                    capital = (capital - (totalParSeconde()*TAUX_IMPOTS));
+                    println("Vous avez payé " + (totalParSeconde()*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
+                    tpsImpots = 0;
+                    delay(2500);
+                }
             }
         } while(capital>=0);
         println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
@@ -100,6 +100,7 @@ class Main extends Program {
     }
 
     void achatJouet() {
+        clearConsole();
         if (nbJouets < MAXJOUETS) {
             double prixJouet;
             if (nbJouets == 0) {
@@ -135,10 +136,11 @@ class Main extends Program {
     }
 
     void menuAmelioration() {
+        clearConsole();
         // Lister les jouets
         int choix = -1;
         for (int iJouet=0; iJouet<nbJouets; iJouet++) {
-            double prixAmelio = (jouets[iJouet].prixAchat * pow(TAUX_AMELIORATION, (jouets[iJouet].niveau-1)));
+            double prixAmelio = (jouets[iJouet].prixAchat * pow(TAUX_AMELIORATION, (jouets[iJouet].niveau)));
             println((iJouet+1) + " : " + jouets[iJouet].nom + " - Niveau " + jouets[iJouet].niveau + " (" + prixAmelio + " " + DEVISE + ")");
         }
         do {
@@ -180,7 +182,17 @@ class Main extends Program {
     }
 
     void infos_jouets() {
-        
+        clearConsole();
+        for (int iJouet=0; iJouet<nbJouets; iJouet++) {
+            println("==============================================      Jouet numéro " + (iJouet+1) + "      ===============================================");
+            println("               Nom :                                " + jouets[iJouet].nom);
+            println("               Niveau :                             " + jouets[iJouet].niveau);
+            println("               Revenu par seconde :                 " + (jouets[iJouet].prixAchat * pow(TAUX_AMELIORATION, (jouets[iJouet].niveau-1))) * TAUX_REVENU + " " + DEVISE);
+            println("               Prix de passage au niveau suivant :  " + (jouets[iJouet].prixAchat * pow(TAUX_AMELIORATION, (jouets[iJouet].niveau))));
+        }
+        println("=========================================================================================================================================");
+        println("Pour quitter, saisissez quelque chose.");
+        readString();
     }
 
     void introduction() {
@@ -210,7 +222,6 @@ class Main extends Program {
         clearConsole();
         println("Voici votre mission :");
         println("-------------------------");
-        delay(delay);
         println("Vous venez d'arriver dans votre magasin.");
         delay(delay);
         println("Votre but : gagner de l'argent le plus efficacement possible");
@@ -263,8 +274,8 @@ class Main extends Program {
 
     double totalParSeconde() {
         double total = 0;
-        for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
-            double dernierPrix = (jouets[i_jouet].prixAchat * pow(TAUX_AMELIORATION, (jouets[i_jouet].niveau-1))); // niveau-1 car dès qu'on l'achète, le jouet est niveau 1
+        for (int iJouet=0; iJouet<nbJouets; iJouet++) {
+            double dernierPrix = (jouets[iJouet].prixAchat * pow(TAUX_AMELIORATION, (jouets[iJouet].niveau-1))); // niveau-1 car dès qu'on l'achète, le jouet est niveau 1
             total += dernierPrix * TAUX_REVENU;
         }
         return total;
