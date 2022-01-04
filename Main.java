@@ -1,19 +1,21 @@
 class Main extends Program {
 
+        final int MAXJOUETS = 2;
+        final String DEVISE = "euros";
+        final int ECART_IMPOTS = 20;  // en seconde
+        final double TAUX_IMPOTS = 0.3;
+        final double TAUX_REVENU = 0.1;
+        final double TAUX_AMELIORATION = 1.5;
+        final int MULT_AMELIORATION = 100;
+        final double BASE_PRIX_ACHAT = 50;
+
     // /!\ à faire : tout mettre dans un csv paramètres /!\
 
-        double capital = 50;
-        double prixJouet = 25;
+        double capital = 100;
         int nbJouets = 0;
-        int maxJouets = 2;
-        Jouet[] jouets = new Jouet[maxJouets];
-        final String DEVISE = "euros";
-
+        Jouet[] jouets = new Jouet[MAXJOUETS];
         String nomPatron;
         int tpsImpots = 0;
-        int ECART_IMPOTS = 20;  // en seconde
-        double TAUX_IMPOTS = 0.3;
-        double taxes = 0;
 
     // -----
 
@@ -47,30 +49,6 @@ class Main extends Program {
         } while(capital>=0);
         println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
         println("Pensez à mieux gérer vos finances !");
-    }
-
-    boolean strToIntPossible(String action){
-        boolean fin = true;
-        int retour = 0;     //mais pas de retour car la fonction et un boolean !
-        int i = 0;
-        while (fin && i<length(action)) {
-            if (charAt(action, i) < '0' || charAt(action, i) > '9') {
-                fin = false;
-            }
-            i++;
-        }
-        return fin;
-    }
-
-    int strToInt(String action) {
-        int retour = 0;
-        if(strToIntPossible(action)){
-            for (int i = 0; i<length(action); i++){
-                int power = (int) (pow(10, (length(action) - 1 - i)));
-                retour += (int) (charAt(action, i) - '0') * power;
-            }
-        }
-        return retour ;
     }
 
     int choisir() {
@@ -118,65 +96,95 @@ class Main extends Program {
         return nouveau;
     }
 
-    void menuAmelioration() {
-        println("Quel jouet souhaitez vous améliorer ?");
-        for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
-            println((i_jouet+1) + " : " + jouets[i_jouet].nom + " (" + jouets[i_jouet].prixAmelioration + " " + DEVISE + ")");
-        }
-        int toUpgrade = 0;
-        do {
-            print("Jouet à améliorer : ");
-            String toUpgradeToy = readString();
-            if (!strToIntPossible(toUpgradeToy)) {
-                println("Il semblerait que vous n'ayez pas entré un nombre");
-            } else {
-                int toUpgradeTemp = strToInt(toUpgradeToy);
-                if (toUpgradeTemp > 0 && toUpgradeTemp <= nbJouets) {
-                    toUpgrade = toUpgradeTemp;
-                } else {
-                    println("Le jouet n'a pas été trouvé !");
-                }
-            }
-        } while (toUpgrade == 0);
-        println("Êtes vous sûr de vouloir améliorer votre production de " + jouets[(toUpgrade-1)].nom + " pour un total de " + jouets[(toUpgrade-1)].prixAmelioration + " " + DEVISE + " ?");
-        String confirm = readString();
-        if (equals("oui", toLowerCase(confirm))) {
-            // Confirmation
-            jouets[(toUpgrade-1)].revenu *= 3;
-            println("Bravo ! Votre jouet a été amélioré ! Il vous rapporte désormais " + jouets[(toUpgrade-1)].revenu + " " + DEVISE + " par seconde !");
-            capital -= jouets[(toUpgrade-1)].prixAmelioration;
-            delay(2000);
-        } else {
-            println("Dommage !");
-        }
-        delay(2000);
-    }
-
-    double totalParSeconde() {
-        double total = 0;
-        for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
-            total += jouets[i_jouet].revenu;
-        }
-        return total;
-    }
-
     void achatJouet() {
-        println("Voulez vous acheter un nouveau jouet pour " + prixJouet + " " + DEVISE + " ?");
-        print("Oui / Non : ");
-        String reponse = toLowerCase(readString());
-        println(reponse);
-        if (equals(reponse, "oui")) {
-            if (nbJouets < maxJouets) {
-                println("Bravo ! Vous venez d'acheter un nouveau jouet ! Comment voulez vous l'appeller ?");
-                Jouet nouveau = nouveauJouet(readString());
-                jouets[(nbJouets-1)] = nouveau;
-                println("Tout est bon, votre jouet produira " + jouets[(nbJouets-1)].revenu + " " + DEVISE + " par seconde !");
-                capital -= prixJouet;
-            } else {
-                println("Mince ! Vous avez acheté tous les jouets possibles !");
-            }
-            delay(4000);
+        double prixJouet;
+        if (nbJouets == 0) {
+            prixJouet = BASE_PRIX_ACHAT;
+        } else {
+            prixJouet = jouets[(nbJouets-1)].prixAchat * MULT_AMELIORATION;
         }
+        println("==================================================   Achat de Jouet   ==================================================");
+        println("                    Prix du jouet                    " + prixJouet  + " " + DEVISE);
+        println("                                              Confirmer l'achat ? (Oui / Non) ");
+        print("Confirmation : ");
+        String answer = readString();
+        println("========================================================================================================================");
+        if (equals("oui", toLowerCase(answer))) {
+            // Confirmé
+            if (capital >= prixJouet) {
+                print("Nom du jouet (ex: Ours en peluche) : ");
+                jouets[nbJouets] = nouveauJouet(readString());
+                println("Bravo ! Vous venez d'acheter un nouveau jouet !");
+            } else {
+                println("Vous ne pouvez pas vous le permettre... Revenez plus tard !");
+            }
+        } else {
+            // Abandonné
+            println("Tant pis ! Revenez vite !");
+        }
+        delay(2500);
+    }
+
+    // void achatJouet() {
+    //     println("Voulez vous acheter un nouveau jouet pour " + PRIXJOUET + " " + DEVISE + " ?");
+    //     print("Oui / Non : ");
+    //     String reponse = toLowerCase(readString());
+    //     println(reponse);
+    //     if (equals(reponse, "oui")) {
+    //         if (nbJouets < MAXJOUETS) {
+    //             if (capital >= prixJouet) {
+    //                 println("Bravo ! Vous venez d'acheter un nouveau jouet ! Comment voulez vous l'appeller ?");
+    //                 Jouet nouveau = nouveauJouet(readString());
+    //                 jouets[(nbJouets-1)] = nouveau;
+    //                 println("Tout est bon, votre jouet produira " + jouets[(nbJouets-1)].revenu + " " + DEVISE + " par seconde !");
+    //                 capital -= prixJouet;
+    //                 prixJouet = prixJouet + 10*prixJouet;
+    //             } else {
+    //                 println("Vous ne pouvez malheureusement pas vous permettre cet achat !");
+    //             }
+    //         } else {
+    //             println("Mince ! Vous avez acheté tous les jouets possibles !");
+    //         }
+    //         delay(4000);
+    //     }
+    // }
+
+    // void menuAmelioration() {
+    //     println("Quel jouet souhaitez vous améliorer ?");
+    //     for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
+    //         println((i_jouet+1) + " : " + jouets[i_jouet].nom + " (" + jouets[i_jouet].prixAmelioration + " " + DEVISE + ")");
+    //     }
+    //     int toUpgrade = 0;
+    //     do {
+    //         print("Jouet à améliorer : ");
+    //         String toUpgradeToy = readString();
+    //         if (!strToIntPossible(toUpgradeToy)) {
+    //             println("Il semblerait que vous n'ayez pas entré un nombre");
+    //         } else {
+    //             int toUpgradeTemp = strToInt(toUpgradeToy);
+    //             if (toUpgradeTemp > 0 && toUpgradeTemp <= nbJouets) {
+    //                 toUpgrade = toUpgradeTemp;
+    //             } else {
+    //                 println("Le jouet n'a pas été trouvé !");
+    //             }
+    //         }
+    //     } while (toUpgrade == 0);
+    //     println("Êtes vous sûr de vouloir améliorer votre production de " + jouets[(toUpgrade-1)].nom + " pour un total de " + jouets[(toUpgrade-1)].prixAmelioration + " " + DEVISE + " ?");
+    //     String confirm = readString();
+    //     if (equals("oui", toLowerCase(confirm))) {
+    //         // Confirmation
+    //         jouets[(toUpgrade-1)].revenu *= 3;
+    //         println("Bravo ! Votre jouet a été amélioré ! Il vous rapporte désormais " + jouets[(toUpgrade-1)].revenu + " " + DEVISE + " par seconde !");
+    //         capital -= jouets[(toUpgrade-1)].prixAmelioration;
+    //         delay(2000);
+    //     } else {
+    //         println("Dommage !");
+    //     }
+    //     delay(2000);
+    // }
+
+    void menuAmelioration() {
+
     }
 
     void introduction() {
@@ -228,8 +236,41 @@ class Main extends Program {
     }
 
     void clearConsole() {
+        // Problème sur windows : Le clearscreen ne repositionne pas le curseur
         clearScreen();
         cursor(1, 1);
+    }
+
+    boolean strToIntPossible(String action){
+        boolean fin = true;
+        int retour = 0;     //mais pas de retour car la fonction et un boolean !
+        int i = 0;
+        while (fin && i<length(action)) {
+            if (charAt(action, i) < '0' || charAt(action, i) > '9') {
+                fin = false;
+            }
+            i++;
+        }
+        return fin;
+    }
+
+    int strToInt(String action) {
+        int retour = 0;
+        if(strToIntPossible(action)){
+            for (int i = 0; i<length(action); i++){
+                int power = (int) (pow(10, (length(action) - 1 - i)));
+                retour += (int) (charAt(action, i) - '0') * power;
+            }
+        }
+        return retour ;
+    }
+
+    double totalParSeconde() {
+        double total = 0;
+        for (int i_jouet=0; i_jouet<nbJouets; i_jouet++) {
+            total += jouets[i_jouet].revenu;
+        }
+        return total;
     }
 
     //##################################################################     TESTS     #######################################################################//

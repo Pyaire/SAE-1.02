@@ -1,5 +1,11 @@
+// class Jouet {
+//     String nom;
+//     double revenu;
+//     double prixAmelioration;
+// }
+
 class Jouet {
     String nom;
-    double revenu;
-    double prixAmelioration;
+    double prixAchat;
+    int niveau;
 }
