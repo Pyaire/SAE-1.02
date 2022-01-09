@@ -326,7 +326,7 @@ class Main extends Program {
         int iFile = 0;
         boolean pris = false;
         while (iFile < length(allFiles) && !pris) {
-            if (allFiles[iFile] == filename) {
+            if (equals(allFiles[iFile], filename)) {
                 pris = true;
             }
             iFile++;
