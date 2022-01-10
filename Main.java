@@ -521,6 +521,13 @@ class Main extends Program {
         clearConsole();
         String entree = "";
         boolean total = true;
+        for (int i = 0 ; i <= 5 ; i++){
+            if (biens[i]){
+                total = true;
+            }else{
+                total = false;
+            }
+        }
         println("==============================================   Construction de biens   ===============================================");
         println("Que voulez vous acheter ?");
         println("1 : Acheter une voiture pour 20 000" + DEVISE);
@@ -529,20 +536,23 @@ class Main extends Program {
         println("4 : Acheter un camion de pompier pour 150 000" + DEVISE);
         println("5 : Acheter une maison pour 200 000" + DEVISE);
         println("6 : Acheter une villa pour 1 000 000" + DEVISE);
-        println("=========================================================================================================================================");
-        for (int i = 0 ; i <= 5 ; i++){
-            if (biens[i]){
-                total = true;
-            }else{
-                total = false;
-            }
-        }
         if (total){
-            println("Woaw tu as tout acheté, vexu tu donc acheter du sucre et des copines pour 5 000" + DEVISE);
+            println("7: Woaw tu as tout acheté, veux tu donc acheter du sucre et des copines pour 5 000 " + DEVISE);
         }
+        println("=========================================================================================================================================");       
+        boolean entreeValide = false;
+        int choix;
         do{
             entee = readString();
-        }while(!equals(entree,"oui") || !equals(entree,"1") || !equals(entree,"2") || !equals(entree,"3") || !equals(entree,"4") || !equals(entree,"5") || !equals(entree,"6"));
+            if (strToIntPossible(entree)) {
+                choix = strToInt(entree);
+                if (choix >= 1 && choix <= 6 && !total || choix >= 1 && choix <= 7 && total) {
+                    entreeValide = true;
+                }
+            } else {
+                println("Vous devez entrer un chiffre !");
+            }
+        }while(!entreeValide);
         switch (entree){
             case "oui":
                 capital -= 5000;
