@@ -6,11 +6,13 @@ class Main extends Program {
     final int MAXJOUETS = 3;
     final String DEVISE = "euros";
     final int ECART_IMPOTS = 20;  // en seconde
-    final double TAUX_IMPOTS = 5; // Part de revenue par seconde
+    double TAUX_IMPOTS = 5; // Part de revenue par seconde
     final double TAUX_REVENU = 0.05;
     final double TAUX_AMELIORATION = 1.5;
     final int MULT_NOUVEAU_ACHAT = 100;
     final double BASE_PRIX_ACHAT = 50;
+    boolean[] biens = new boolean[6];   //Voiture, Garage, Camion de pompier, appart, Maison, Villa.
+    boolean duSucreEtDesCopines = false; 
 
     void algorithm() {
         boolean fin = false;
@@ -54,9 +56,7 @@ class Main extends Program {
             int initialTemps = (int) (getTime() / 1000);
             int choix = choisir(jouets, nbJouets, capital, tpsImpots);
             if (choix == 2) {
-                double[] achat = achatJouet(jouets, nbJouets, capital);
-                nbJouets += (int) achat[0]; // Achat de nouveau jouet
-                capital -= achat[1];
+                nbJouets += achatJouet(jouets, nbJouets, capital); // Achat de nouveau jouet
                 delay(2500);
             } else if (choix == 3) {
                 // Amélioration
@@ -64,9 +64,11 @@ class Main extends Program {
             } else if (choix == 4) {
                 infos_jouets(jouets, nbJouets);
             } else if (choix == 5) {
+                // Construction
+            } else if (choix == 6) {
                 // Sauvegarde
                 sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets);
-            } else if (choix == 6) {
+            } else if (choix == 7) {
                 println("Cette fonctionnalité n'est pas encore disponible...");
                 delay(2500);
             } else if (choix == 9) {
@@ -104,11 +106,12 @@ class Main extends Program {
             println("                    2                             Acheter un nouveau jouet");
             println("                    3                             Améliorer la production");
             println("                    4                             Informations sur les jouets");
-            println("                    5                             Sauvegarder la partie");
-            println("                    9                             Quitter le jeu (N'oubliez pas de sauvegarder)");
+            println("                    5                             Construire");
+            println("                    6                             Sauvegarder la partie");
             if (nbJouets == MAXJOUETS) {
-                println("                    6                          ===   Terminer le jeu  ===                                               ");
+                println("                    7                          ===   Terminer le jeu  ===                                               ");
             }
+            println("                    9                             Quitter le jeu (N'oubliez pas de sauvegarder)");
             println("========================================================================================================================");
             println();
 
@@ -140,11 +143,10 @@ class Main extends Program {
         return nouveau;
     }
 
-    double[] achatJouet(Jouet[] jouets, int nbJouets, double capital) {
+    int achatJouet(Jouet[] jouets, int nbJouets, double capital) {
         clearConsole();
-        double prixJouet = 0;
-        double nbJouetAchete = 0;
         if (nbJouets < MAXJOUETS) {
+            double prixJouet;
             if (nbJouets == 0) {
                 prixJouet = BASE_PRIX_ACHAT;
             } else {
@@ -164,7 +166,7 @@ class Main extends Program {
                     jouets[nbJouets] = nouveauJouet(nomJouet, prixJouet, 1);
                     capital -= prixJouet;
                     println("Bravo ! Vous venez d'acheter un nouveau jouet !");
-                    nbJouetAchete++;
+                    return 1;
                 } else {
                     println("Vous ne pouvez pas vous le permettre... Revenez plus tard !");
                 }
@@ -175,8 +177,7 @@ class Main extends Program {
         } else {
             println("Vous ne pouvez pas acheter plus de jouets, mais vous pouvez terminer le jeu !");
         }
-        double[] result = new double[]{nbJouetAchete, prixJouet};
-        return result;
+        return 0;
     }
 
     void menuAmelioration(Jouet[] jouets, int nbJouets, double capital) {
@@ -330,7 +331,7 @@ class Main extends Program {
         int iFile = 0;
         boolean pris = false;
         while (iFile < length(allFiles) && !pris) {
-            if (equals(allFiles[iFile], avecExtensionCsv(filename))) {
+            if (allFiles[iFile] == filename) {
                 pris = true;
             }
             iFile++;
@@ -490,6 +491,157 @@ class Main extends Program {
             }
         }
         return -1;
+    }
+
+    void menuConstruction(){
+        clearConsole();
+        String entree = "";
+        println("==============================================   Construction de biens   ===============================================");
+        println("Que voulez vous faire ?");
+        println("1 : Acheter un bien");
+        println("2 : Voir mes proproétés");
+        println("3 : retour");
+        println("=========================================================================================================================================");
+        do{
+            entree = readString();
+            if (strToIntPossible(entree)){
+            entree = strToInt(entree);
+
+            }while(!strToIntPossible(entree) || strToInt(entree) > 3 && strToInt(entree) < 1);
+        }
+
+    if(entree = 1){
+        menuAchatBien();
+    }else if(entree = 2){
+        menuBiens();
+    }
+    }
+
+    void menuAchatBien(boolean[] biens, double capital, boolean duSucreEtDesCopines, int TAUX_IMPOTS){
+        clearConsole();
+        String entree = "";
+        boolean total = true;
+        println("==============================================   Construction de biens   ===============================================");
+        println("Que voulez vous acheter ?");
+        println("1 : Acheter une voiture pour 20 000" + DEVISE);
+        println("2 : Acheter un garage pour 50 000" + DEVISE);
+        println("3 : Acheter un appartement pour 80 000" + DEVISE);
+        println("4 : Acheter un camion de pompier pour 150 000" + DEVISE);
+        println("5 : Acheter une maison pour 200 000" + DEVISE);
+        println("6 : Acheter une villa pour 1 000 000" + DEVISE);
+        println("=========================================================================================================================================");
+        for (int i = 0 ; i <= 5 ; i++){
+            if (biens[i]){
+                total = true;
+            }else{
+                total = false;
+            }
+        }
+        if (total){
+            println("Woaw tu as tout acheté, vexu tu donc acheter du sucre et des copines pour 5 000" + DEVISE);
+        }
+        do{
+            entee = readString();
+        }while(!equals(entree,"oui") || !equals(entree,"1") || !equals(entree,"2") || !equals(entree,"3") || !equals(entree,"4") || !equals(entree,"5") || !equals(entree,"6"));
+        switch (entree){
+            case "oui":
+                capital -= 5000;
+                TAUX_IMPOTS += 2;
+                duSucreEtDesCopines = true;
+                println("Tu as fais l'aquisition de sucre et de copines, amuse toi bien ^^");
+                break;
+            case "1":
+                if(20000<capital){
+                    if(!biens[0]){
+                        biens[0] = true;
+                        TAUX_IMPOTS += 3;
+                        capital -= 20000;
+                        println("Tu viens de faire l'aquisition d'une voiture");
+
+                    }else{
+                        println("tu n'as pas encore assez d'argent pour acheter ceci, reviens plus tard");
+                    }
+                }else{
+                    println("Tu ne peux pas faire l'aquisition de ce quE tu possèdes déjà");
+                }
+                break;
+            case "2":
+                if(50000<capital){
+                    if(!biens[1]){
+                        biens[1] = true;
+                        TAUX_IMPOTS += 5;
+                        capital -= 50000;
+                        println("Tu viens de faire l'aquisition d'un garge");
+                    }else{
+                        println("Tu ne peux pas faire l'aquisition de ce quE tu possèdes déjà");
+                    }
+
+                }else{
+                    println("tu n'as pas encore assez d'argent pour acheter ceci, reviens plus tard");
+                }
+                break;
+            case "3":
+                if(80000<capital){
+                    if(!biens[2]){
+                        biens[2] = true;
+                        TAUX_IMPOTS += 5;
+                        capital -= 80000;
+                        println("Tu viens de faire l'aquisition d'un appartement");
+                    }else{
+                        println("Tu ne peux pas faire l'aquisition de ce quE tu possèdes déjà");
+                    }
+                }else{
+                    println("tu n'as pas encore assez d'argent pour acheter ceci, reviens plus tard");
+                }
+                break;
+            case "4":
+                if(150000<capital){
+                    if(!biens[3]){
+                        biens[3] = true;
+                        TAUX_IMPOTS -= 3;
+                        capital -= 150000;
+                        println("Tu viens de faire l'aquisition d'un camion de pompier");
+                    }else{
+                        println("Tu ne peux pas faire l'aquisition de ce quE tu possèdes déjà");
+                    }
+                }else{
+                    println("tu n'as pas encore assez d'argent pour acheter ceci, reviens plus tard");
+                }
+                break;
+            case "5":
+            if(200000<capital){
+                if(!biens[4]){
+                    biens[4] = true;
+                    TAUX_IMPOTS += 7;
+                    capital -= 200000;
+                    println("Tu viens de faire l'aquisition d'une maison");
+                }else{
+                    println("Tu ne peux pas faire l'aquisition de ce quE tu possèdes déjà");
+                }
+            }else{
+                println("tu n'as pas encore assez d'argent pour acheter ceci, reviens plus tard");
+            }
+                break;
+            case "6":
+            if(1000000<capital){
+                if(!biens[5]){
+                    biens[5] = true;
+                    TAUX_IMPOTS += 10;
+                    capital -= 1000000;
+                    println("Tu viens de faire l'aquisition d'une villa");
+                }else{
+                    println("Tu ne peux pas faire l'aquisition de ce quE tu possèdes déjà");
+                }
+            }else{
+                println("tu n'as pas encore assez d'argent pour acheter ceci, reviens plus tard");
+            }
+                break;
+        }
+
+    void menuBiens(boolean[] biens,boolean duSucreEtDesCopines){
+
+    }                
+
     }
 
     //##################################################################     TESTS     #######################################################################//
