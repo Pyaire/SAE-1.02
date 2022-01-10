@@ -6,16 +6,16 @@ class Main extends Program {
     final int MAXJOUETS = 3;
     final String DEVISE = "euros";
     final int ECART_IMPOTS = 20;  // en seconde
-    double TAUX_IMPOTS = 5; // Part de revenue par seconde
     final double TAUX_REVENU = 0.05;
     final double TAUX_AMELIORATION = 1.5;
     final int MULT_NOUVEAU_ACHAT = 100;
     final double BASE_PRIX_ACHAT = 50;
     boolean[] biens = new boolean[6];   //Voiture, Garage, Camion de pompier, appart, Maison, Villa.
     boolean duSucreEtDesCopines = false; 
+    double TAUX_IMPOTS = 5; // Part de revenue par seconde
 
     void algorithm() {
-        boolean fin = false;
+        boolean quitter = false;
 
         double capital = 100;
         String nomPatron = "";
@@ -73,10 +73,9 @@ class Main extends Program {
                 // Sauvegarde
                 sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets);
             } else if (choix == 7) {
-                println("Cette fonctionnalité n'est pas encore disponible...");
-                delay(2500);
+                fin();
             } else if (choix == 9) {
-                fin = true;
+                quitter = true;
             } else {
                 // Récupérer l'argent
                 int ecartTemps = (int) ((getTime()/1000)-initialTemps);
@@ -89,8 +88,8 @@ class Main extends Program {
                     delay(2500);
                 }
             }
-        } while(capital>=0 && !fin);
-        if (!fin) {
+        } while(capital>=0 && !quitter);
+        if (!quitter) {
             println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
             println("Pensez à mieux gérer vos finances !");
         } else {
@@ -277,17 +276,21 @@ class Main extends Program {
         delay(delay);
         println("Attention tout de même à bien gérer vos finances,");
         delay(delay);
-        println("toutes les " + ECART_IMPOTS + " secondes, vous devrez payer " + (TAUX_IMPOTS*100) + "% de votre production par seconde !");
+        println("Toutes les " + ECART_IMPOTS + " secondes, vous devrez payer " + TAUX_IMPOTS + " fois de votre production par seconde !");
         delay(delay);
         println("Si vous tombez en dessous des 0 euros de capital, c'est perdu !");
         delay(delay);
         println("Vous pourrez acheter un nouveau produit qui vous rapportera de l'argent par seconde,");
         delay(delay);
-        println("vous pouvez aussi en améliorer un pour qu'il vous rapporte plus !");
+        println("Vous pouvez aussi en améliorer un pour qu'il vous rapporte plus !");
         delay(delay);
-        println();
-        println("Bonne chance à vous patron !");
-        println("-------------------------");
+        println("Vous pourrez aussi acheter des biens (Maison, villa...) mais attention !");
+        delay(delay);
+        println("Vous devrez payer plus cher par seconde en ayant ces biens...");
+        delay(delay);
+        println("Pour terminer le jeu, il vous suffit d'acheter un total de " + MAXJOUETS + " jouets différents !");
+        delay(delay);
+        println("Vous comprendrez mieux quand vous y serez ! On y va ? Patron ?");
         delay(delay*2);
     }
 
@@ -657,8 +660,10 @@ class Main extends Program {
 
     void menuBiens(boolean[] biens,boolean duSucreEtDesCopines){
 
-    }                
+    }
 
+    void fin() {
+        
     }
 
     //##################################################################     TESTS     #######################################################################//
