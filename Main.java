@@ -330,7 +330,7 @@ class Main extends Program {
         int iFile = 0;
         boolean pris = false;
         while (iFile < length(allFiles) && !pris) {
-            if (equals(allFiles[iFile], filename)) {
+            if (equals(allFiles[iFile], avecExtensionCsv(filename))) {
                 pris = true;
             }
             iFile++;
