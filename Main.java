@@ -537,7 +537,7 @@ class Main extends Program {
         println("5 : Acheter une maison pour 200 000" + DEVISE);
         println("6 : Acheter une villa pour 1 000 000" + DEVISE);
         if (total){
-            println("7: Woaw tu as tout acheté, veux tu donc acheter du sucre et des copines pour 5 000 " + DEVISE);
+            println("7: Acheter du sucre et des copines pour 5 000 " + DEVISE);
         }
         println("=========================================================================================================================================");       
         boolean entreeValide = false;
