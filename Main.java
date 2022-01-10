@@ -54,7 +54,9 @@ class Main extends Program {
             int initialTemps = (int) (getTime() / 1000);
             int choix = choisir(jouets, nbJouets, capital, tpsImpots);
             if (choix == 2) {
-                nbJouets += achatJouet(jouets, nbJouets, capital); // Achat de nouveau jouet
+                double[] achat = achatJouet(jouets, nbJouets, capital);
+                nbJouets += (int) achat[0]; // Achat de nouveau jouet
+                capital -= achat[1];
                 delay(2500);
             } else if (choix == 3) {
                 // Amélioration
@@ -138,10 +140,11 @@ class Main extends Program {
         return nouveau;
     }
 
-    int achatJouet(Jouet[] jouets, int nbJouets, double capital) {
+    double[] achatJouet(Jouet[] jouets, int nbJouets, double capital) {
         clearConsole();
+        double prixJouet = 0;
+        double nbJouetAchete = 0;
         if (nbJouets < MAXJOUETS) {
-            double prixJouet;
             if (nbJouets == 0) {
                 prixJouet = BASE_PRIX_ACHAT;
             } else {
@@ -161,7 +164,7 @@ class Main extends Program {
                     jouets[nbJouets] = nouveauJouet(nomJouet, prixJouet, 1);
                     capital -= prixJouet;
                     println("Bravo ! Vous venez d'acheter un nouveau jouet !");
-                    return 1;
+                    nbJouetAchete++;
                 } else {
                     println("Vous ne pouvez pas vous le permettre... Revenez plus tard !");
                 }
@@ -172,7 +175,8 @@ class Main extends Program {
         } else {
             println("Vous ne pouvez pas acheter plus de jouets, mais vous pouvez terminer le jeu !");
         }
-        return 0;
+        double[] result = new double[]{nbJouetAchete, prixJouet};
+        return result;
     }
 
     void menuAmelioration(Jouet[] jouets, int nbJouets, double capital) {
