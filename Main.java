@@ -543,7 +543,7 @@ class Main extends Program {
         boolean entreeValide = false;
         int choix;
         do{
-            print("Que souhaitez vous faire ?");
+            print("Que souhaitez vous faire ? Choix : ");
             entee = readString();
             if (strToIntPossible(entree)) {
                 choix = strToInt(entree);
