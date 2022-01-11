@@ -23,7 +23,7 @@ class Main extends Program {
         Bien[] biens = initBiens();   //Voiture, Garage, Camion de pompier, appart, Maison, Villa, sucre et copines.
 
         clearConsole();
-        print("Souhaitez vous charger une sauvegarde ? (Oui / Non) : ");
+        print("           Souhaitez vous charger une sauvegarde ? (Oui / Non) : ");
         String load_save = toLowerCase(readString());
 
         if (equals("oui", load_save)) {
@@ -33,7 +33,6 @@ class Main extends Program {
                 capital = strToDouble(getCell(fichierSauvegarde, 0, 0));
                 nomPatron = getCell(fichierSauvegarde, 0, 1);
                 tpsImpots = strToInt(getCell(fichierSauvegarde, 0, 2));
-
                 for (int row=1; row<rowCount(fichierSauvegarde); row++) {
                     if (equals(getCell(fichierSauvegarde, row, 0), "Jouet")) {
                         jouets[(row-1)] = nouveauJouet(
@@ -43,7 +42,7 @@ class Main extends Program {
                         );
                         nbJouets++;
                     } else if (equals(getCell(fichierSauvegarde, row, 0), "Bien")) {
-                        possederBien(biens, getCell(fichierSauvegarde, row, 1));
+                        TAUX_IMPOTS += possederBien(biens, getCell(fichierSauvegarde, row, 1));
                     }
                 }
             } else {
@@ -78,7 +77,7 @@ class Main extends Program {
                 // Sauvegarde
                 sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets, biens);
             } else if (choix == 7) {
-                fin();
+                fin(nomPatron);
             } else if (choix == 9) {
                 quitter = true;
             } else {
@@ -88,7 +87,7 @@ class Main extends Program {
                 tpsImpots += ecartTemps;
                 if (tpsImpots >= ECART_IMPOTS){
                     capital = (capital - (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS));
-                    println("Vous avez payé " + (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
+                    println("           Vous avez payé " + (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
                     tpsImpots = 0;
                     delay(2500);
                 }
@@ -102,16 +101,16 @@ class Main extends Program {
         }
     }
 
-    void possederBien(Bien[] biens, String nom) {
-        boolean trouve = false;
+    double possederBien(Bien[] biens, String nom) {
         int idx = 0;
-        while (!trouve && idx<length(biens)) {
+        while (idx<length(biens)) {
             if (equals(biens[idx].nom, nom)) {
                 biens[idx].possede = true;
-                trouve = true;
+                return biens[idx].taux_impots;
             }
             idx++;
         }
+        return 0;
     }
 
     Bien[] initBiens() {
@@ -165,7 +164,7 @@ class Main extends Program {
             choix = readString(5000);
             estValide = strToIntPossible(choix);
             if (!estValide) {
-                println("Il semblerait que vous n'ayez pas entré un nombre ! Veuillez réessayer !");
+                println("           Il semblerait que vous n'ayez pas entré un nombre ! Veuillez réessayer !");
             }
         } while (!estValide);
         choix_final = strToInt(choix);
@@ -204,27 +203,27 @@ class Main extends Program {
             println("==================================================   Achat de Jouet   ==================================================");
             println("                    Prix du jouet                    " + prixJouet  + " " + DEVISE);
             println("                                              Confirmer l'achat ? (Oui / Non) ");
-            print("Confirmation : ");
+            print("           Confirmation : ");
             String answer = readString();
             println("========================================================================================================================");
             if (equals("oui", toLowerCase(answer))) {
                 // Confirmé
                 if (capital >= prixJouet) {
-                    print("Nom du jouet (ex: Ours en peluche) : ");
+                    print("           Nom du jouet (ex: Ours en peluche) : ");
                     String nomJouet = sansVirgule(readString());
                     jouets[nbJouets] = nouveauJouet(nomJouet, prixJouet, 1);
                     capital -= prixJouet;
-                    println("Bravo ! Vous venez d'acheter un nouveau jouet !");
+                    println("           Bravo ! Vous venez d'acheter un nouveau jouet !");
                     nbAchetes = 1;
                 } else {
-                    println("Vous ne pouvez pas vous le permettre... Revenez plus tard !");
+                    println("           Vous ne pouvez pas vous le permettre... Revenez plus tard !");
                 }
             } else {
                 // Abandonné
-                println("Tant pis ! Revenez vite !");
+                println("           Tant pis ! Revenez vite !");
             }
         } else {
-            println("Vous ne pouvez pas acheter plus de jouets, mais vous pouvez terminer le jeu !");
+            println("           Vous ne pouvez pas acheter plus de jouets, mais vous pouvez terminer le jeu !");
         }
         return new double[]{nbAchetes, prixAchat};
     }
@@ -238,13 +237,13 @@ class Main extends Program {
             println((iJouet+1) + " : " + jouets[iJouet].nom + " - Niveau " + jouets[iJouet].niveau + " (" + prixAmelio + " " + DEVISE + ")");
         }
         do {
-            print("Jouet à améliorer : ");
+            print("           Jouet à améliorer : ");
             String reponse = readString();
             int reponse_int = strToInt(reponse);
             if (reponse_int > 0 && reponse_int <= nbJouets) {
                 choix = reponse_int;
             } else {
-                println("Le choix n'est pas dans la liste !");
+                println("           Le choix n'est pas dans la liste !");
             }
         } while (choix == -1);
         choix--; // Le convertir pour un array
@@ -252,7 +251,7 @@ class Main extends Program {
         println("==============================================   Amélioration de Jouet   ===============================================");
         println("                    Prix de l'amélioration       " + prixAmelioration  + " " + DEVISE);
         println("                                         Confirmer l'amélioration ? (Oui / Non) ");
-        print("Confirmation : ");
+        print("           Confirmation : ");
         String answer = readString();
         println("========================================================================================================================");
         if (equals("oui", toLowerCase(answer))) {
@@ -260,13 +259,13 @@ class Main extends Program {
             if (capital >= prixAmelioration) {
                 jouets[choix].niveau++;
                 capital -= prixAmelioration;
-                println("Bravo ! Vous venez d'améliorer un jouet !");
+                println("           Bravo ! Vous venez d'améliorer un jouet !");
             } else {
-                println("Vous ne pouvez pas vous le permettre... Revenez plus tard !");
+                println("           Vous ne pouvez pas vous le permettre... Revenez plus tard !");
             }
         } else {
             // Abandonné
-            println("Tant pis ! Revenez vite !");
+            println("           Tant pis ! Revenez vite !");
         }
         delay(2500);
     }
@@ -421,47 +420,41 @@ class Main extends Program {
         }
     }
 
+    int nombreDeBiens(Bien[] biens) {
+        int total = 0;
+        for (int i=0; i<length(biens); i++) {
+            if (biens[i].possede) {
+                total++;
+            }
+        }
+        return total;
+    }
+
     void sauvegarde(double capital, String nomPatron, int nbJouets, int tpsImpots, Jouet[] jouets, Bien[] biens) {
-        /*
-        Exemple de fichier de sauvegarde
-
-        // Informations
-        A1 : capital
-        B1 : nomPatron
-        C1 : tpsImpots
-
-        // Jouets
-        A2 : Type (Jouet ou Bien)
-        B2 : nom du jouet ou du bien
-        C2 : prix d'achat
-        D2 : Niveau
-
-        ...
-        ...
-        ...
-        */
-
         clearConsole();
 
-        String[][] save = new String[(nbJouets+1)][3];
+        String[][] save = new String[(1+nbJouets+nombreDeBiens(biens))][4];
         save[0][0] = "" + capital + "";
         save[0][1] = "" + nomPatron + "";
         save[0][2] = "" + tpsImpots + "";
-
+        
         for (int iJouet=0; iJouet<nbJouets; iJouet++) {
             save[(iJouet+1)][0] = "Jouet";
             save[(iJouet+1)][1] = jouets[iJouet].nom;
+            save[(iJouet+1)][2] = "" + jouets[iJouet].prixAchat + "";
+            save[(iJouet+1)][3] = "" + jouets[iJouet].niveau + "";
         }
-
+        
+        int decal_row_biens = 0;
         for (int iBien=0; iBien<length(biens); iBien++) {
-            save[(nbJouets+iBien+1)][0] = "Bien";
             // Nom Prix Possede taux_impots
-            save[(nbJouets+iBien+1)][1] = "" + biens[iBien].nom + "";
-            save[(nbJouets+iBien+1)][2] = "" + biens[iBien].prix + "";
-            save[(nbJouets+iBien+1)][3] = "" + booleanToStr(biens[iBien].possede) + "";
-            save[(nbJouets+iBien+1)][4] = "" + biens[iBien].taux_impots + "";
+            if (biens[iBien].possede) {
+                save[(nbJouets+decal_row_biens+1)][0] = "Bien";
+                save[(nbJouets+decal_row_biens+1)][1] = "" + biens[iBien].nom + "";
+                decal_row_biens++;
+            }
         }
-
+        
         println("==================================================     Sauvegarde     ==================================================");
         print("           Souhaitez vous sauvergarder ? (Oui / Non) : ");
         String sauvegarde_y_n = toLowerCase(readString());
@@ -493,24 +486,24 @@ class Main extends Program {
     String loadSave(double capital, String nomPatron, int nbJouets, int tpsImpots, Jouet[] jouets) {
         String[] allFiles = getAllFilesFromDirectory("Saves");
         if (length(allFiles) == 0) {
-            println("Aucun fichier de sauvegarde n'a été trouvé...");
+            println("           Aucun fichier de sauvegarde n'a été trouvé...");
             delay(2500);
             return "";
         } else {
-            println("Liste des sauvegardes :");
+            println("           Liste des sauvegardes :");
             for (int i=0; i<length(allFiles); i++) {
-                println((i+1) + " : " + allFiles[i]);
+                println("              " + (i+1) + " : " + allFiles[i]);
             }
             boolean saiseValide = false;
             int saveNb = 0;
             while (!saiseValide) {
-                print("Sauvegarde à charger : ");
+                print("           Sauvegarde à charger : ");
                 String aCharger = readString();
                 saveNb = strToInt(aCharger);
                 if (saveNb >= 1 && saveNb <= length(allFiles)) {
                     saiseValide = true;
                 } else {
-                    println("La sauvegarde demandée n'est pas dans la liste.");
+                    println("           La sauvegarde demandée n'est pas dans la liste.");
                 }
             }
             return allFiles[(saveNb-1)];
@@ -618,10 +611,10 @@ class Main extends Program {
                 if (entree >= 1 && entree <= 3) {
                     entreeValide = true;
                 } else {
-                    println("Le choix entré n'est pas dans la liste !");
+                    println("           Le choix entré n'est pas dans la liste !");
                 }
             } else {
-                println("Vous devez entrer un chiffre !");
+                println("           Vous devez entrer un chiffre !");
             }
         } while(!entreeValide);
 
@@ -648,7 +641,7 @@ class Main extends Program {
         String entreeString = "";
         int entree = -1;
         do {
-            print("Que souhaitez vous faire ? Choix : ");
+            print("           Que souhaitez vous faire ? Choix : ");
             entreeString = readString();
             if (strToIntPossible(entreeString)) {
                 entree = strToInt(entreeString);
@@ -657,25 +650,28 @@ class Main extends Program {
                     entreeValide = true;
                 } else if (entree == (length(biens) + 1)) {
                     // Quitter
+                    quitter = true;
                 } else {
-                    println("Le chiffre entré n'est pas dans la liste !");
+                    println("           Le chiffre entré n'est pas dans la liste !");
                 }
             } else {
-                println("Vous devez entrer un chiffre !");
+                println("           Vous devez entrer un chiffre !");
             }
         } while(!entreeValide && !quitter);
-        entree--; // Mettre au format d'un tableau ([1-7] -> [0-6]);
-        print("           Êtes vous sûr de vouloir acheter " + biens[entree].nom + " pour " + biens[entree].prix + " " + DEVISE + " ? Vous devrez payer " + biens[entree].taux_impots + " fois votre production en plus toutes les " + ECART_IMPOTS + " secondes (Oui / Non) : ");
-        String answer = toLowerCase(readString());
-        if (equals(answer, "oui")) {
-            if (capital >= biens[entree].prix) {
-                biens[entree].possede = true;
-                println("Bravo ! Vous avez acheté un nouveau bien !");
+        if (entreeValide) {
+            entree--; // Mettre au format d'un tableau ([1-7] -> [0-6]);
+            print("           Êtes vous sûr de vouloir acheter " + biens[entree].nom + " pour " + biens[entree].prix + " " + DEVISE + " ? Vous devrez payer " + biens[entree].taux_impots + " fois votre production en plus toutes les " + ECART_IMPOTS + " secondes (Oui / Non) : ");
+            String answer = toLowerCase(readString());
+            if (equals(answer, "oui")) {
+                if (capital >= biens[entree].prix) {
+                    biens[entree].possede = true;
+                    println("           Bravo ! Vous avez acheté un nouveau bien !");
+                    delay(2000);
+                    return new double[]{biens[entree].prix, biens[entree].taux_impots};
+                }
                 delay(2000);
-                return new double[]{biens[entree].prix, biens[entree].taux_impots};
+                println("           Vous n'avez pas les fonds... Revenez vite !");
             }
-            delay(2000);
-            println("Vous n'avez pas les fonds... Revenez vite !");
         }
         return new double[]{0, 0};
     }
@@ -693,8 +689,16 @@ class Main extends Program {
         readString();
     }
 
-    void fin() {
-        println("c'est fini");
+    void fin(String nomPatron) {
+        int delay = 2000;
+        println("Félicitations " + nomPatron + " !");
+        delay(delay);
+        println("Vous avez réussi à obtenir un total de " + MAXJOUETS + " jouets !");
+        delay(delay);
+        println("Vous en êtes venu à bout patron, encore bravo !");
+        delay(delay);
+        println("Vous pouvez toujours continuer à vour enrichir, si vous le souhaitez !");
+        delay(delay*2);
     }
 
     //##################################################################     TESTS     #######################################################################//
