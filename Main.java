@@ -67,7 +67,9 @@ class Main extends Program {
                 infos_jouets(jouets, nbJouets);
             } else if (choix == 5) {
                 // Construction
-                capital -= menuConstruction(biens, capital);
+                double[] impacts = menuConstruction(biens, capital);
+                capital -= impacts[0];
+                TAUX_IMPOTS += impacts[1];
             } else if (choix == 6) {
                 // Sauvegarde
                 sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets);
@@ -542,7 +544,7 @@ class Main extends Program {
         return -1;
     }
 
-    double menuConstruction(Bien[] biens, double capital) {
+    double[] menuConstruction(Bien[] biens, double capital) {
         clearConsole();
         println("==============================================   Construction de biens   ===============================================");
         println("                                                 Que voulez vous faire ?");
@@ -572,10 +574,10 @@ class Main extends Program {
         } else if (entree == 2) {
             menuBiens(biens);
         }
-        return 0;
+        return new double[]{0, 0};
     }
 
-    double achatBien(Bien[] biens, double capital){
+    double[] achatBien(Bien[] biens, double capital){
         clearConsole();
         println("==============================================   Construction de biens   ===============================================");
         for (int i=0; i<length(biens); i++) {
@@ -607,19 +609,19 @@ class Main extends Program {
             }
         } while(!entreeValide && !quitter);
         entree--; // Mettre au format d'un tableau ([1-7] -> [0-6]);
-        print("           Êtes vous sûr de vouloir acheter " + biens[entree].nom + " pour " + biens[entree].prix + " " + DEVISE + " ? Vous devrez payer " + biens[taux_impots] + " fois votre production en plus toutes les " + ECART_IMPOTS + " secondes (Oui / Non) : ");
+        print("           Êtes vous sûr de vouloir acheter " + biens[entree].nom + " pour " + biens[entree].prix + " " + DEVISE + " ? Vous devrez payer " + biens[entree].taux_impots + " fois votre production en plus toutes les " + ECART_IMPOTS + " secondes (Oui / Non) : ");
         String answer = toLowerCase(readString());
         if (equals(answer, "oui")) {
             if (capital >= biens[entree].prix) {
                 biens[entree].possede = true;
                 println("Bravo ! Vous avez acheté un nouveau bien !");
                 delay(2000);
-                return biens[entree].prix;
+                return new double[]{biens[entree].prix, biens[entree].taux_impots};
             }
             delay(2000);
             println("Vous n'avez pas les fonds... Revenez vite !");
         }
-        return 0;
+        return new double[]{0, 0};
     }
 
     void menuBiens(Bien[] biens){
