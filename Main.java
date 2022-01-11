@@ -12,94 +12,94 @@ class Main extends Program {
     final double BASE_PRIX_ACHAT = 50;
     double TAUX_IMPOTS = 5; // Part de revenue par seconde
 
-    void algorithm() {
-        boolean quitter = false;
+    // void algorithm() {
+    //     boolean quitter = false;
 
-        double capital = 100;
-        String nomPatron = "";
-        int nbJouets = 0;
-        Jouet[] jouets = new Jouet[MAXJOUETS];
-        int tpsImpots = 0;
-        Bien[] biens = initBiens();   //Voiture, Garage, Camion de pompier, appart, Maison, Villa, sucre et copines.
+    //     double capital = 100;
+    //     String nomPatron = "";
+    //     int nbJouets = 0;
+    //     Jouet[] jouets = new Jouet[MAXJOUETS];
+    //     int tpsImpots = 0;
+    //     Bien[] biens = initBiens();   //Voiture, Garage, Camion de pompier, appart, Maison, Villa, sucre et copines.
 
-        clearConsole();
-        print("           Souhaitez vous charger une sauvegarde ? (Oui / Non) : ");
-        String load_save = toLowerCase(readString());
+    //     clearConsole();
+    //     print("           Souhaitez vous charger une sauvegarde ? (Oui / Non) : ");
+    //     String load_save = toLowerCase(readString());
 
-        if (equals("oui", load_save)) {
-            String filename = loadSave(capital, nomPatron, nbJouets, tpsImpots, jouets);
-            if (!equals(filename, "")) {
-                CSVFile fichierSauvegarde = loadCSV("Saves/" + filename);
-                capital = strToDouble(getCell(fichierSauvegarde, 0, 0));
-                nomPatron = getCell(fichierSauvegarde, 0, 1);
-                tpsImpots = strToInt(getCell(fichierSauvegarde, 0, 2));
-                for (int row=1; row<rowCount(fichierSauvegarde); row++) {
-                    if (equals(getCell(fichierSauvegarde, row, 0), "Jouet")) {
-                        jouets[(row-1)] = nouveauJouet(
-                            getCell(fichierSauvegarde, row, 1),
-                            strToDouble(getCell(fichierSauvegarde, row, 2)),
-                            strToInt(getCell(fichierSauvegarde, row, 3))
-                        );
-                        nbJouets++;
-                    } else if (equals(getCell(fichierSauvegarde, row, 0), "Bien")) {
-                        TAUX_IMPOTS += possederBien(biens, getCell(fichierSauvegarde, row, 1));
-                    }
-                }
-            } else {
-                nomPatron = introduction(capital);
-            }
-        } else {
-            nomPatron = introduction(capital);
-        }
+    //     if (equals("oui", load_save)) {
+    //         String filename = loadSave(capital, nomPatron, nbJouets, tpsImpots, jouets);
+    //         if (!equals(filename, "")) {
+    //             CSVFile fichierSauvegarde = loadCSV("Saves/" + filename);
+    //             capital = strToDouble(getCell(fichierSauvegarde, 0, 0));
+    //             nomPatron = getCell(fichierSauvegarde, 0, 1);
+    //             tpsImpots = strToInt(getCell(fichierSauvegarde, 0, 2));
+    //             for (int row=1; row<rowCount(fichierSauvegarde); row++) {
+    //                 if (equals(getCell(fichierSauvegarde, row, 0), "Jouet")) {
+    //                     jouets[(row-1)] = nouveauJouet(
+    //                         getCell(fichierSauvegarde, row, 1),
+    //                         strToDouble(getCell(fichierSauvegarde, row, 2)),
+    //                         strToInt(getCell(fichierSauvegarde, row, 3))
+    //                     );
+    //                     nbJouets++;
+    //                 } else if (equals(getCell(fichierSauvegarde, row, 0), "Bien")) {
+    //                     TAUX_IMPOTS += possederBien(biens, getCell(fichierSauvegarde, row, 1));
+    //                 }
+    //             }
+    //         } else {
+    //             nomPatron = introduction(capital);
+    //         }
+    //     } else {
+    //         nomPatron = introduction(capital);
+    //     }
 
-        do {
-            capital = round(capital);
-            int initialTemps = (int) (getTime() / 1000);
-            int choix = choisir(jouets, nbJouets, capital, tpsImpots);
-            if (choix == 2) {
-                double[] achat = achatJouet(jouets, nbJouets, capital);
-                nbJouets += achat[0]; // Achat de nouveau jouet
-                if (achat[0] == 1) {
-                    capital -= achat[1];
-                }
-                delay(2500);
-            } else if (choix == 3) {
-                // Amélioration
-                menuAmelioration(jouets, nbJouets, capital);
-            } else if (choix == 4) {
-                infos_jouets(jouets, nbJouets);
-            } else if (choix == 5) {
-                // Construction
-                double[] impacts = menuConstruction(biens, capital);
-                capital -= impacts[0];
-                TAUX_IMPOTS += impacts[1];
-            } else if (choix == 6) {
-                // Sauvegarde
-                sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets, biens);
-            } else if (choix == 7) {
-                fin(nomPatron);
-            } else if (choix == 9) {
-                quitter = true;
-            } else {
-                // Récupérer l'argent
-                int ecartTemps = (int) ((getTime()/1000)-initialTemps);
-                capital += totalParSeconde(jouets, nbJouets) * ecartTemps;
-                tpsImpots += ecartTemps;
-                if (tpsImpots >= ECART_IMPOTS){
-                    capital = (capital - (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS));
-                    println("           Vous avez payé " + (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
-                    tpsImpots = 0;
-                    delay(2500);
-                }
-            }
-        } while(capital>=0 && !quitter);
-        if (!quitter) {
-            println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
-            println("Pensez à mieux gérer vos finances !");
-        } else {
-            println("A la prochaine !");
-        }
-    }
+    //     do {
+    //         capital = round(capital);
+    //         int initialTemps = (int) (getTime() / 1000);
+    //         int choix = choisir(jouets, nbJouets, capital, tpsImpots);
+    //         if (choix == 2) {
+    //             double[] achat = achatJouet(jouets, nbJouets, capital);
+    //             nbJouets += achat[0]; // Achat de nouveau jouet
+    //             if (achat[0] == 1) {
+    //                 capital -= achat[1];
+    //             }
+    //             delay(2500);
+    //         } else if (choix == 3) {
+    //             // Amélioration
+    //             menuAmelioration(jouets, nbJouets, capital);
+    //         } else if (choix == 4) {
+    //             infos_jouets(jouets, nbJouets);
+    //         } else if (choix == 5) {
+    //             // Construction
+    //             double[] impacts = menuConstruction(biens, capital);
+    //             capital -= impacts[0];
+    //             TAUX_IMPOTS += impacts[1];
+    //         } else if (choix == 6) {
+    //             // Sauvegarde
+    //             sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets, biens);
+    //         } else if (choix == 7) {
+    //             fin(nomPatron);
+    //         } else if (choix == 9) {
+    //             quitter = true;
+    //         } else {
+    //             // Récupérer l'argent
+    //             int ecartTemps = (int) ((getTime()/1000)-initialTemps);
+    //             capital += totalParSeconde(jouets, nbJouets) * ecartTemps;
+    //             tpsImpots += ecartTemps;
+    //             if (tpsImpots >= ECART_IMPOTS){
+    //                 capital = (capital - (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS));
+    //                 println("           Vous avez payé " + (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
+    //                 tpsImpots = 0;
+    //                 delay(2500);
+    //             }
+    //         }
+    //     } while(capital>=0 && !quitter);
+    //     if (!quitter) {
+    //         println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
+    //         println("Pensez à mieux gérer vos finances !");
+    //     } else {
+    //         println("A la prochaine !");
+    //     }
+    // }
 
     double possederBien(Bien[] biens, String nom) {
         int idx = 0;
