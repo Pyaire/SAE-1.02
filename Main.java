@@ -5,7 +5,7 @@ class Main extends Program {
 
     final int MAXJOUETS = 3;
     final String DEVISE = "euros";
-    final int ECART_IMPOTS = 20;  // en seconde
+    final int ECART_IMPOTS = 60;  // en seconde
     final double TAUX_REVENU = 0.05;
     final double TAUX_AMELIORATION = 1.5;
     final int MULT_NOUVEAU_ACHAT = 100;
@@ -35,12 +35,16 @@ class Main extends Program {
                 tpsImpots = strToInt(getCell(fichierSauvegarde, 0, 2));
 
                 for (int row=1; row<rowCount(fichierSauvegarde); row++) {
-                    jouets[(row-1)] = nouveauJouet(
-                        getCell(fichierSauvegarde, row, 0),
-                        strToDouble(getCell(fichierSauvegarde, row, 1)),
-                        strToInt(getCell(fichierSauvegarde, row, 2))
-                    );
-                    nbJouets++;
+                    if (equals(getCell(fichierSauvegarde, row, 0), "Jouet")) {
+                        jouets[(row-1)] = nouveauJouet(
+                            getCell(fichierSauvegarde, row, 1),
+                            strToDouble(getCell(fichierSauvegarde, row, 2)),
+                            strToInt(getCell(fichierSauvegarde, row, 3))
+                        );
+                        nbJouets++;
+                    } else if (equals(getCell(fichierSauvegarde, row, 0), "Bien")) {
+                        possederBien(biens, getCell(fichierSauvegarde, row, 1));
+                    }
                 }
             } else {
                 nomPatron = introduction(capital);
@@ -72,7 +76,7 @@ class Main extends Program {
                 TAUX_IMPOTS += impacts[1];
             } else if (choix == 6) {
                 // Sauvegarde
-                sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets);
+                sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets, biens);
             } else if (choix == 7) {
                 fin();
             } else if (choix == 9) {
@@ -95,6 +99,18 @@ class Main extends Program {
             println("Pensez à mieux gérer vos finances !");
         } else {
             println("A la prochaine !");
+        }
+    }
+
+    void possederBien(Bien[] biens, String nom) {
+        boolean trouve = false;
+        int idx = 0;
+        while (!trouve && idx<length(biens)) {
+            if (equals(biens[idx].nom, nom)) {
+                biens[idx].possede = true;
+                trouve = true;
+            }
+            idx++;
         }
     }
 
@@ -343,6 +359,13 @@ class Main extends Program {
 
     int strToInt(String action) {
         int retour = 0;
+        int posCarac = posCaractere(action, 'E');
+        int exposant = 0;
+        if (posCarac != -1) {
+            // Il y a une puissance
+            exposant = strToInt(substring(action, (posCarac+1), length(action)));
+            action = substring(action, 0, posCarac);
+        }
         if(strToIntPossible(action)){
             for (int i = 0; i<length(action); i++){
                 int power = (int) (pow(10, (length(action) - 1 - i)));
@@ -351,7 +374,8 @@ class Main extends Program {
         } else {
             println(action + " n'est pas un nombre.");
         }
-        return retour ;
+        retour *= pow(10, exposant);
+        return round(retour);
     }
 
     double totalParSeconde(Jouet[] jouets, int nbJouets) {
@@ -368,13 +392,13 @@ class Main extends Program {
         int iFile = 0;
         boolean pris = false;
         while (iFile < length(allFiles) && !pris) {
-            if (allFiles[iFile] == filename) {
+            if (equals(allFiles[iFile], filename)) {
                 pris = true;
             }
             iFile++;
         }
         if (pris) {
-            print("Le fichier existe déjà. Voulez-vous l'écraser ? (Oui / Non) : ");
+            print("           Le fichier existe déjà. Voulez-vous l'écraser ? (Oui / Non) : ");
             String ecraser = toLowerCase(readString());
             if (!equals(ecraser, "oui")) {
                 return true;
@@ -397,20 +421,20 @@ class Main extends Program {
         }
     }
 
-    void sauvegarde(double capital, String nomPatron, int nbJouets, int tpsImpots, Jouet[] jouets) {
+    void sauvegarde(double capital, String nomPatron, int nbJouets, int tpsImpots, Jouet[] jouets, Bien[] biens) {
         /*
         Exemple de fichier de sauvegarde
 
         // Informations
         A1 : capital
         B1 : nomPatron
-        C1 : nbJouets
-        D1 : tpsImpots
+        C1 : tpsImpots
 
         // Jouets
-        A2 : nom du jouet
-        B2 : prix d'achat
-        C2 : Niveau
+        A2 : Type (Jouet ou Bien)
+        B2 : nom du jouet ou du bien
+        C2 : prix d'achat
+        D2 : Niveau
 
         ...
         ...
@@ -425,28 +449,41 @@ class Main extends Program {
         save[0][2] = "" + tpsImpots + "";
 
         for (int iJouet=0; iJouet<nbJouets; iJouet++) {
-            save[(iJouet+1)][0] = jouets[iJouet].nom;
-            save[(iJouet+1)][1] = "" + jouets[iJouet].prixAchat + "";
-            save[(iJouet+1)][2] = "" + jouets[iJouet].niveau + "";
+            save[(iJouet+1)][0] = "Jouet";
+            save[(iJouet+1)][1] = jouets[iJouet].nom;
+        }
+
+        for (int iBien=0; iBien<length(biens); iBien++) {
+            save[(nbJouets+iBien+1)][0] = "Bien";
+            // Nom Prix Possede taux_impots
+            save[(nbJouets+iBien+1)][1] = "" + biens[iBien].nom + "";
+            save[(nbJouets+iBien+1)][2] = "" + biens[iBien].prix + "";
+            save[(nbJouets+iBien+1)][3] = "" + booleanToStr(biens[iBien].possede) + "";
+            save[(nbJouets+iBien+1)][4] = "" + biens[iBien].taux_impots + "";
         }
 
         println("==================================================     Sauvegarde     ==================================================");
         print("           Souhaitez vous sauvergarder ? (Oui / Non) : ");
         String sauvegarde_y_n = toLowerCase(readString());
         if (equals(sauvegarde_y_n, "oui")) {
+
+            println("           Fichiers existants : ");
+            String[] allFiles = getAllFilesFromDirectory("Saves");
+            for (int i=0; i<length(allFiles); i++) {
+                println("              " + substring(allFiles[i], 0, length(allFiles[i])-4));
+            }
+
             boolean filename_est_valide = false;
             String filename = "";
             while (!filename_est_valide) {
                 print("           Nom du fichier : ");
-                filename = sansCaracteresSpeciaux(readString());
+                filename = avecExtensionCsv(sansCaracteresSpeciaux(readString()));
                 if (length(filename) > 0 && !filenameDejaPris(filename)) {
                     filename_est_valide = true;
                 } else {
                     println("           Veuillez entrer un autre nom de fichier");
                 }
             }
-            
-            filename = avecExtensionCsv(filename);
             saveCSV(save, "Saves/" + filename);
             println("           La sauvegarde a été effectuée !");
             delay(2500);
@@ -505,6 +542,13 @@ class Main extends Program {
     double strToDouble(String number) {
         double retour = 0;
         int positionVirgule = posVirgule(number);
+        int posCarac = posCaractere(number, 'E');
+        int exposant = 0;
+        if (posCarac != -1) {
+            // Il y a une puissance
+            exposant = strToInt(substring(number, (posCarac+1), length(number)));
+            number = substring(number, 0, posCarac);
+        }
         if (positionVirgule == -1) {
             retour = strToInt(number);
         } else {
@@ -518,7 +562,20 @@ class Main extends Program {
                 retour = partieEntiere + partieDecimale * pow(0.1, length(decimales));
             }
         }
-        return retour;
+        retour *= pow(10, exposant);
+        return round(retour);
+    }
+
+    int posCaractere(String chaine, char lettre) {
+        int position = -1;
+        int idx=0;
+        while (position == -1 && idx<length(chaine)) {
+            if (charAt(chaine, idx) == lettre) {
+                position = idx;
+            }
+            idx++;
+        }
+        return position;
     }
 
     boolean strToBoolean(String state) {
@@ -528,7 +585,7 @@ class Main extends Program {
         return false;
     }
 
-    String booleanToString(boolean state) {
+    String booleanToStr(boolean state) {
         if (state) {
             return "true";
         }
@@ -547,7 +604,6 @@ class Main extends Program {
     double[] menuConstruction(Bien[] biens, double capital) {
         clearConsole();
         println("==============================================   Construction de biens   ===============================================");
-        println("                                                 Que voulez vous faire ?");
         println("           1                                     Acheter un bien");
         println("           2                                     Voir mes propriétés");
         println("           3                                     Retour");
