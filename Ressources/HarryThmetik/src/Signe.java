@@ -1,1 +1,0 @@
-enum Signe{PLUS, MOINS}
