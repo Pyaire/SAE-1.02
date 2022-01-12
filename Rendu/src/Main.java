@@ -116,7 +116,7 @@ class Main extends Program {
     Bien[] initBiens() {
 
         // Récupérer le CSV de biens
-            CSVFile biensCSV = loadCSV("biens.csv");
+            CSVFile biensCSV = loadCSV("../ressources/biens.csv");
         //
 
         Bien[] biens = new Bien[rowCount(biensCSV)];
@@ -477,7 +477,7 @@ class Main extends Program {
                     println("           Veuillez entrer un autre nom de fichier");
                 }
             }
-            saveCSV(save, "./saves/" + filename);
+            saveCSV(save, "../saves/" + filename);
             println("           La sauvegarde a été effectuée !");
             delay(2500);
         }
