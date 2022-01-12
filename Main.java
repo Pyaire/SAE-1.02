@@ -12,94 +12,94 @@ class Main extends Program {
     final double BASE_PRIX_ACHAT = 50;
     double TAUX_IMPOTS = 5; // Part de revenue par seconde
 
-    // void algorithm() {
-    //     boolean quitter = false;
+    void algorithm() {
+        boolean quitter = false;
 
-    //     double capital = 100;
-    //     String nomPatron = "";
-    //     int nbJouets = 0;
-    //     Jouet[] jouets = new Jouet[MAXJOUETS];
-    //     int tpsImpots = 0;
-    //     Bien[] biens = initBiens();   //Voiture, Garage, Camion de pompier, appart, Maison, Villa, sucre et copines.
+        double capital = 100;
+        String nomPatron = "";
+        int nbJouets = 0;
+        Jouet[] jouets = new Jouet[MAXJOUETS];
+        int tpsImpots = 0;
+        Bien[] biens = initBiens();   //Voiture, Garage, Camion de pompier, appart, Maison, Villa, sucre et copines.
 
-    //     clearConsole();
-    //     print("           Souhaitez vous charger une sauvegarde ? (Oui / Non) : ");
-    //     String load_save = toLowerCase(readString());
+        clearConsole();
+        print("           Souhaitez vous charger une sauvegarde ? (Oui / Non) : ");
+        String load_save = toLowerCase(readString());
 
-    //     if (equals("oui", load_save)) {
-    //         String filename = loadSave(capital, nomPatron, nbJouets, tpsImpots, jouets);
-    //         if (!equals(filename, "")) {
-    //             CSVFile fichierSauvegarde = loadCSV("Saves/" + filename);
-    //             capital = strToDouble(getCell(fichierSauvegarde, 0, 0));
-    //             nomPatron = getCell(fichierSauvegarde, 0, 1);
-    //             tpsImpots = strToInt(getCell(fichierSauvegarde, 0, 2));
-    //             for (int row=1; row<rowCount(fichierSauvegarde); row++) {
-    //                 if (equals(getCell(fichierSauvegarde, row, 0), "Jouet")) {
-    //                     jouets[(row-1)] = nouveauJouet(
-    //                         getCell(fichierSauvegarde, row, 1),
-    //                         strToDouble(getCell(fichierSauvegarde, row, 2)),
-    //                         strToInt(getCell(fichierSauvegarde, row, 3))
-    //                     );
-    //                     nbJouets++;
-    //                 } else if (equals(getCell(fichierSauvegarde, row, 0), "Bien")) {
-    //                     TAUX_IMPOTS += possederBien(biens, getCell(fichierSauvegarde, row, 1));
-    //                 }
-    //             }
-    //         } else {
-    //             nomPatron = introduction(capital);
-    //         }
-    //     } else {
-    //         nomPatron = introduction(capital);
-    //     }
+        if (equals("oui", load_save)) {
+            String filename = loadSave(capital, nomPatron, nbJouets, tpsImpots, jouets);
+            if (!equals(filename, "")) {
+                CSVFile fichierSauvegarde = loadCSV("Saves/" + filename);
+                capital = strToDouble(getCell(fichierSauvegarde, 0, 0));
+                nomPatron = getCell(fichierSauvegarde, 0, 1);
+                tpsImpots = strToInt(getCell(fichierSauvegarde, 0, 2));
+                for (int row=1; row<rowCount(fichierSauvegarde); row++) {
+                    if (equals(getCell(fichierSauvegarde, row, 0), "Jouet")) {
+                        jouets[(row-1)] = nouveauJouet(
+                            getCell(fichierSauvegarde, row, 1),
+                            strToDouble(getCell(fichierSauvegarde, row, 2)),
+                            strToInt(getCell(fichierSauvegarde, row, 3))
+                        );
+                        nbJouets++;
+                    } else if (equals(getCell(fichierSauvegarde, row, 0), "Bien")) {
+                        TAUX_IMPOTS += possederBien(biens, getCell(fichierSauvegarde, row, 1));
+                    }
+                }
+            } else {
+                nomPatron = introduction(capital);
+            }
+        } else {
+            nomPatron = introduction(capital);
+        }
 
-    //     do {
-    //         capital = round(capital);
-    //         int initialTemps = (int) (getTime() / 1000);
-    //         int choix = choisir(jouets, nbJouets, capital, tpsImpots);
-    //         if (choix == 2) {
-    //             double[] achat = achatJouet(jouets, nbJouets, capital);
-    //             nbJouets += achat[0]; // Achat de nouveau jouet
-    //             if (achat[0] == 1) {
-    //                 capital -= achat[1];
-    //             }
-    //             delay(2500);
-    //         } else if (choix == 3) {
-    //             // Amélioration
-    //             menuAmelioration(jouets, nbJouets, capital);
-    //         } else if (choix == 4) {
-    //             infos_jouets(jouets, nbJouets);
-    //         } else if (choix == 5) {
-    //             // Construction
-    //             double[] impacts = menuConstruction(biens, capital);
-    //             capital -= impacts[0];
-    //             TAUX_IMPOTS += impacts[1];
-    //         } else if (choix == 6) {
-    //             // Sauvegarde
-    //             sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets, biens);
-    //         } else if (choix == 7) {
-    //             fin(nomPatron);
-    //         } else if (choix == 9) {
-    //             quitter = true;
-    //         } else {
-    //             // Récupérer l'argent
-    //             int ecartTemps = (int) ((getTime()/1000)-initialTemps);
-    //             capital += totalParSeconde(jouets, nbJouets) * ecartTemps;
-    //             tpsImpots += ecartTemps;
-    //             if (tpsImpots >= ECART_IMPOTS){
-    //                 capital = (capital - (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS));
-    //                 println("           Vous avez payé " + (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
-    //                 tpsImpots = 0;
-    //                 delay(2500);
-    //             }
-    //         }
-    //     } while(capital>=0 && !quitter);
-    //     if (!quitter) {
-    //         println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
-    //         println("Pensez à mieux gérer vos finances !");
-    //     } else {
-    //         println("A la prochaine !");
-    //     }
-    // }
+        do {
+            capital = round(capital);
+            int initialTemps = (int) (getTime() / 1000);
+            int choix = choisir(jouets, nbJouets, capital, tpsImpots);
+            if (choix == 2) {
+                double[] achat = achatJouet(jouets, nbJouets, capital);
+                nbJouets += achat[0]; // Achat de nouveau jouet
+                if (achat[0] == 1) {
+                    capital -= achat[1];
+                }
+                delay(2500);
+            } else if (choix == 3) {
+                // Amélioration
+                menuAmelioration(jouets, nbJouets, capital);
+            } else if (choix == 4) {
+                infos_jouets(jouets, nbJouets);
+            } else if (choix == 5) {
+                // Construction
+                double[] impacts = menuConstruction(biens, capital);
+                capital -= impacts[0];
+                TAUX_IMPOTS += impacts[1];
+            } else if (choix == 6) {
+                // Sauvegarde
+                sauvegarde(capital, nomPatron, nbJouets, tpsImpots, jouets, biens);
+            } else if (choix == 7) {
+                fin(nomPatron);
+            } else if (choix == 9) {
+                quitter = true;
+            } else {
+                // Récupérer l'argent
+                int ecartTemps = (int) ((getTime()/1000)-initialTemps);
+                capital += totalParSeconde(jouets, nbJouets) * ecartTemps;
+                tpsImpots += ecartTemps;
+                if (tpsImpots >= ECART_IMPOTS){
+                    capital = (capital - (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS));
+                    println("           Vous avez payé " + (totalParSeconde(jouets, nbJouets)*TAUX_IMPOTS) + " " + DEVISE + " d'impôts !");
+                    tpsImpots = 0;
+                    delay(2500);
+                }
+            }
+        } while(capital>=0 && !quitter);
+        if (!quitter) {
+            println("Vous avez perdu ! Votre capital est de " + capital + " " + DEVISE + "...");
+            println("Pensez à mieux gérer vos finances !");
+        } else {
+            println("A la prochaine !");
+        }
+    }
 
     double possederBien(Bien[] biens, String nom) {
         int idx = 0;
@@ -358,12 +358,12 @@ class Main extends Program {
 
     int strToInt(String action) {
         int retour = 0;
-        int posCarac = posCaractere(action, 'E');
+        int posExpo = posCaractere(action, 'E');
         int exposant = 0;
-        if (posCarac != -1) {
+        if (posExpo != -1) {
             // Il y a une puissance
-            exposant = strToInt(substring(action, (posCarac+1), length(action)));
-            action = substring(action, 0, posCarac);
+            exposant = strToInt(substring(action, (posExpo+1), length(action)));
+            action = substring(action, 0, posExpo);
         }
         if(strToIntPossible(action)){
             for (int i = 0; i<length(action); i++){
@@ -374,7 +374,7 @@ class Main extends Program {
             println(action + " n'est pas un nombre.");
         }
         retour *= pow(10, exposant);
-        return round(retour);
+        return retour;
     }
 
     double totalParSeconde(Jouet[] jouets, int nbJouets) {
@@ -470,7 +470,7 @@ class Main extends Program {
             String filename = "";
             while (!filename_est_valide) {
                 print("           Nom du fichier : ");
-                filename = avecExtensionCsv(sansCaracteresSpeciaux(readString()));
+                filename = avecExtensionCsv(enCaracteresAscii(readString()));
                 if (length(filename) > 0 && !filenameDejaPris(filename)) {
                     filename_est_valide = true;
                 } else {
@@ -510,12 +510,12 @@ class Main extends Program {
         }
     }
 
-    String sansCaracteresSpeciaux(String phrase) {
+    String enCaracteresAscii(String phrase) {
         String result = "";
         char carac;
         for (int i=0; i<length(phrase); i++) {
             carac = charAt(phrase, i);
-            if (carac >= 'A' && carac <= 'Z' || carac >= 'a' && carac <= 'z' || carac >= 0 && carac <= 9) {
+            if (carac >= 'A' && carac <= 'Z' || carac >= 'a' && carac <= 'z' || carac >= '0' && carac <= '9' || carac == ' ') {
                 result += carac;
             }
         }
@@ -534,29 +534,40 @@ class Main extends Program {
 
     double strToDouble(String number) {
         double retour = 0;
-        int positionVirgule = posVirgule(number);
-        int posCarac = posCaractere(number, 'E');
+        int positionVirgule = posCaractere(number, '.');
+        int posExpo = posCaractere(number, 'E');
         int exposant = 0;
-        if (posCarac != -1) {
+        if (posExpo != -1) {
             // Il y a une puissance
-            exposant = strToInt(substring(number, (posCarac+1), length(number)));
-            number = substring(number, 0, posCarac);
+            exposant = strToInt(substring(number, (posExpo+1), length(number)));
+            number = substring(number, 0, posExpo);
         }
         if (positionVirgule == -1) {
+            if (!strToIntPossible(number)) {
+                return -1.0;
+            }
             retour = strToInt(number);
         } else {
+            if (!strToIntPossible(substring(number, 0, positionVirgule))) {
+                println(number + " + a");
+                return 1.0;
+            }
             int partieEntiere = strToInt(substring(number, 0, positionVirgule));
             if (positionVirgule == length(number)) {
                 // Pas de décimale car virgule est le dernier caractère
                 retour = partieEntiere;
             } else {
                 String decimales = substring(number, (positionVirgule+1), length(number)); // PositionVirgule + 1 pour ne pas prendre la virgule
+                if (!strToIntPossible(decimales)) {
+                    println(number + " + b");
+                    return -1.0;
+                }
                 int partieDecimale = strToInt(decimales);
                 retour = partieEntiere + partieDecimale * pow(0.1, length(decimales));
             }
         }
         retour *= pow(10, exposant);
-        return round(retour);
+        return retour;
     }
 
     int posCaractere(String chaine, char lettre) {
@@ -583,15 +594,6 @@ class Main extends Program {
             return "true";
         }
         return "false";
-    }
-
-    int posVirgule(String number) {
-        for (int i=0; i<length(number); i++) {
-            if (charAt(number, i) == '.') {
-                return i;
-            }
-        }
-        return -1;
     }
 
     double[] menuConstruction(Bien[] biens, double capital) {
@@ -691,19 +693,20 @@ class Main extends Program {
 
     void fin(String nomPatron) {
         int delay = 2000;
-        println("Félicitations " + nomPatron + " !");
+        String nomEmploye = "Pyaire";
+        println(nomEmploye + " : Félicitations " + nomPatron + " !");
         delay(delay);
-        println("Vous avez réussi à obtenir un total de " + MAXJOUETS + " jouets !");
+        println(nomEmploye + " : Vous avez réussi à obtenir un total de " + MAXJOUETS + " jouets !");
         delay(delay);
-        println("Vous en êtes venu à bout patron, encore bravo !");
+        println(nomEmploye + " : Vous en êtes venu à bout patron, encore bravo !");
         delay(delay);
-        println("Vous pouvez toujours continuer à vour enrichir, si vous le souhaitez !");
+        println(nomEmploye + " : Vous pouvez toujours continuer à vour enrichir, si vous le souhaitez !");
         delay(delay*2);
     }
 
     //##################################################################     TESTS     #######################################################################//
 
-    void testEstValide(){
+    void testStrToIntPossible(){
         assertTrue(strToIntPossible("674265"));
         assertFalse(strToIntPossible("a5642"));
         assertFalse(strToIntPossible("395678687G"));
@@ -711,13 +714,15 @@ class Main extends Program {
         assertTrue(strToIntPossible(""));
     }
 
-    void teststrToInt(){
+    void testStrToInt(){
         assertEquals(674265,strToInt("674265"));
         assertEquals(5642,strToInt("5642"));
         assertEquals(395678687,strToInt("395678687"));
         assertEquals(5395,strToInt("5395"));
         assertEquals(32245,strToInt("32245"));
         assertNotEquals(10,strToInt("38"));
+        assertEquals(1000, strToInt("1E3"));
+        assertEquals(1001000000, strToInt("1001E6"));
     }
 
     void testStrToDouble() {
@@ -725,6 +730,101 @@ class Main extends Program {
         assertEquals(4.0, strToDouble("4."));
         assertEquals(0.355, strToDouble("0.355"));
         assertEquals(0.355, strToDouble(".355"));
+        assertNotEquals(10,strToDouble("38"));
+        assertEquals(5895000.0, strToDouble("5895E3"));
+    }
+
+    void testNouveauJouet() {
+        Jouet jouet = new Jouet();
+        jouet.nom = "Ours en peluche";
+        jouet.prixAchat = 50.0;
+        jouet.niveau = 50;
+
+        Jouet jouet2 = nouveauJouet("Ours en peluche", 50.0, 50);
+        assertEquals(jouet.nom, jouet2.nom);
+        assertEquals(jouet.prixAchat, jouet2.prixAchat);
+        assertEquals(jouet.niveau, jouet2.niveau);
+
+        jouet.niveau = 25;
+        assertEquals(jouet.nom, jouet2.nom);
+        assertEquals(jouet.prixAchat, jouet2.prixAchat);
+        assertNotEquals(jouet.niveau, jouet2.niveau);
+        assertEquals(jouet.niveau, 25);
+    }
+
+    void testNouveauBien() {
+        Bien bien = new Bien();
+        bien.nom = "Test";
+        bien.prix = 50.0;
+        bien.possede = true;
+        bien.taux_impots = 5.0;
+
+        Bien bien2 = nouveauBien("Test", 50.0, true, 5.0);
+        assertEquals(bien.nom, bien2.nom);
+        assertEquals(bien.prix, bien2.prix);
+        assertEquals(bien.possede, bien2.possede);
+        assertEquals(bien.taux_impots, bien2.taux_impots);
+
+        bien.possede = false;
+        assertEquals(bien.nom, bien2.nom);
+        assertEquals(bien.prix, bien2.prix);
+        assertNotEquals(bien.possede, bien2.possede);
+        assertEquals(bien.taux_impots, bien2.taux_impots);
+        assertFalse(bien.possede);
+    }
+
+    void testTotalParSeconde() {
+        Jouet[] jouets = new Jouet[2];
+        jouets[0] = nouveauJouet("Ours 1", 50.0, 1);
+        jouets[1] = nouveauJouet("Ours 2", 100.0, 1);
+        assertEquals(7.5, totalParSeconde(jouets, 2));
+    }
+
+    void testAvecExtensionCsv() {
+        assertEquals("test.csv", avecExtensionCsv("test.csv"));
+        assertEquals("test.csv", avecExtensionCsv("test"));
+        assertEquals("testcsv.csv", avecExtensionCsv("testcsv"));
+    }
+
+    void testNombreDeBiens() {
+        Bien[] biens = new Bien[4];
+        biens[0] = nouveauBien("Nom 1", 50.0, true, 2.0);
+        biens[1] = nouveauBien("Nom 2", 50.0, false, 2.0);
+        biens[2] = nouveauBien("Nom 3", 50.0, false, 2.0);
+        biens[3] = nouveauBien("Nom 4", 50.0, true, 2.0);
+
+        assertEquals(2, nombreDeBiens(biens));
+        biens[3].possede = false;
+        assertEquals(1, nombreDeBiens(biens));
+    }
+
+    void testEnCaracteresAscii() {
+        assertEquals("Ceci est une phrase totalement normale 123", enCaracteresAscii("Ceci est une phrase totalement normale 123"));
+        assertEquals("Ceci est une phrase totalement normale 123", enCaracteresAscii("Cé!ec#i @es_t- ^^unùe *pµhrùa%s:e; t.o,-t/a*l_e&m²e/*n_--t no)r[]m({a}l^!e 123"));
+    }
+
+    void testSansVirugle() {
+        assertEquals("Test", sansVirgule("Te,st"));
+        assertEquals("Test", sansVirgule(",,,,,,,,,,T,,,,,,,,,,e,,,,,,,,,,,,,,,,,,s,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"));
     }
     
+    void testPosCaractere() {
+        assertEquals(-1, posCaractere("ABCDEFU", 'H'));
+        assertEquals(0, posCaractere("ABCDEFU", 'A'));
+        assertEquals(-1, posCaractere("ABCDEFU", 'a'));
+        assertEquals(5, posCaractere("ABCDEFU", 'F'));
+    }
+
+    void testStrToBoolean() {
+        assertTrue(strToBoolean("true"));
+        assertFalse(strToBoolean("false"));
+        assertFalse(strToBoolean("ffaallssee"));
+        assertFalse(strToBoolean("pas bon"));
+    }
+
+    void testBooleanToStr() {
+        assertEquals("true", booleanToStr(true));
+        assertEquals("false", booleanToStr(false));
+    }
+
 }
