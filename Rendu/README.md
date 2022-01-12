@@ -2,7 +2,7 @@
 
 ## Présentation de Life Tycoon
 
-??? est un logiciel pour apprendre à gérer ses finances. Nous jouons un patron d'entreprise qui cherche à engranger du profit. Il est proposé de pouvoir améliorer une production de jouets pour qu'elle rapporte plus d'argent, d'acheter une production d'un autre jouet, ou d'acheter des biens (Maison, villa, garage...).
+Life Tycoon est un logiciel pour apprendre à gérer ses finances. Nous jouons un patron d'entreprise qui cherche à engranger du profit. Il est proposé de pouvoir améliorer une production de jouets pour qu'elle rapporte plus d'argent, d'acheter une production d'un autre jouet, ou d'acheter des biens (Maison, villa, garage...).
 
 Paramètrages par défaut :
 Toutes les 60 secondes, une partie de la production par seconde est saisie (5 fois au début). Cette proportion peut grandir en achetant des biens
