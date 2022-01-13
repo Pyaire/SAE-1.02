@@ -1,7 +1,7 @@
 import extensions.CSVFile;
 import extensions.File;
 
-class Main extends Program {
+class LifeTycoon extends Program {
 
     final int MAXJOUETS = 3;
     final String DEVISE = "euros";
