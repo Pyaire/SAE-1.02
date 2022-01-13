@@ -670,6 +670,8 @@ class LifeTycoon extends Program {
                     println("           Bravo ! Vous avez acheté un nouveau bien !");
                     delay(2000);
                     return new double[]{biens[entree].prix, biens[entree].taux_impots};
+                } else {
+                    println("           Vous n'avez pas les fonds nécessaire ! Revenez plus tard !");
                 }
                 delay(2000);
                 println("           Vous n'avez pas les fonds... Revenez vite !");
